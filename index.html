@@ -1,0 +1,1219 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="หาทนาย – ระบบค้นหาทนายความทั่วประเทศไทย ปรึกษากฎหมายฟรี จับคู่ทนายเฉพาะทาง">
+<meta name="keywords" content="หาทนาย,ทนายความ,ปรึกษากฎหมาย,ทนายคดีแพ่ง,ทนายคดีอาญา,ทนายมรดก,ทนายปกครอง,ทนายทุจริต">
+<title>หาทนาย – ค้นหาทนายความทั่วไทย</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚖️</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;600;700;800&family=Playfair+Display:wght@700;900&display=swap" rel="stylesheet">
+<style>
+/* ===== TOKENS ===== */
+:root {
+  --navy:    #0B1D2E;
+  --navy2:   #132639;
+  --navy3:   #1C3350;
+  --gold:    #C8A84B;
+  --gold2:   #E5C76B;
+  --cream:   #F7F3EA;
+  --cream2:  #EDE8DB;
+  --white:   #FFFFFF;
+  --muted:   #6B7C93;
+  --text:    #1A2A3A;
+  --green:   #1E8A4C;
+  --green2:  #27AE60;
+  --red:     #C0392B;
+  --orange:  #D97706;
+  --blue:    #2563EB;
+  --purple:  #6C5CE7;
+  --border:  #D4CDBE;
+  --shadow:  0 4px 24px rgba(11,29,46,0.10);
+  --shadow-lg: 0 12px 48px rgba(11,29,46,0.18);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:'Sarabun',sans-serif;background:var(--cream);color:var(--text);line-height:1.6;font-size:16px}
+a{color:inherit;text-decoration:none}
+button{cursor:pointer;font-family:'Sarabun',sans-serif}
+img{max-width:100%}
+
+/* ===== NAVBAR ===== */
+.navbar{
+  position:sticky;top:0;z-index:1000;
+  background:var(--navy);
+  border-bottom:2px solid var(--gold);
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 2rem;height:64px;gap:1rem;
+}
+.navbar-logo{
+  font-family:'Playfair Display',serif;
+  color:var(--gold);font-size:1.4rem;letter-spacing:1px;
+  display:flex;align-items:center;gap:0.4rem;white-space:nowrap;
+}
+.navbar-links{display:flex;gap:0.2rem;flex:1;justify-content:center;flex-wrap:wrap}
+.navbar-links a{
+  color:#9FB3C8;font-size:0.85rem;font-weight:600;
+  padding:0.4rem 0.8rem;border-radius:4px;transition:all 0.2s;white-space:nowrap;
+}
+.navbar-links a:hover,.navbar-links a.active{color:var(--gold);background:rgba(200,168,75,0.08)}
+.navbar-actions{display:flex;gap:0.5rem;white-space:nowrap}
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:0.4rem;
+  padding:0.5rem 1.2rem;border-radius:6px;font-size:0.85rem;font-weight:700;
+  border:none;transition:all 0.2s;white-space:nowrap;
+}
+.btn-outline{background:transparent;border:1.5px solid var(--gold);color:var(--gold)}
+.btn-outline:hover{background:var(--gold);color:var(--navy)}
+.btn-gold{background:var(--gold);color:var(--navy)}
+.btn-gold:hover{background:var(--gold2)}
+.btn-green{background:var(--green);color:#fff}
+.btn-green:hover{background:var(--green2)}
+.btn-navy{background:var(--navy);color:var(--gold);border:1.5px solid var(--gold)}
+.btn-lg{padding:0.75rem 2rem;font-size:1rem;border-radius:8px}
+
+/* ===== HERO ===== */
+.hero{
+  background:linear-gradient(160deg,var(--navy) 0%,var(--navy3) 60%,#1a3a2a 100%);
+  padding:5rem 2rem 4rem;text-align:center;position:relative;overflow:hidden;
+}
+.hero::before{
+  content:'⚖';position:absolute;font-size:28rem;opacity:0.025;
+  top:50%;left:50%;transform:translate(-50%,-54%);pointer-events:none;
+  color:var(--gold);
+}
+.hero-badge{
+  display:inline-block;background:rgba(200,168,75,0.15);
+  border:1px solid rgba(200,168,75,0.4);
+  color:var(--gold2);font-size:0.75rem;font-weight:700;letter-spacing:2px;
+  padding:0.35rem 1rem;border-radius:20px;margin-bottom:1.2rem;
+}
+.hero h1{
+  font-family:'Playfair Display',serif;
+  font-size:clamp(2rem,5vw,3.2rem);
+  color:var(--white);line-height:1.2;margin-bottom:1rem;position:relative;
+}
+.hero h1 span{color:var(--gold)}
+.hero-sub{color:#8AACC4;font-size:1.05rem;margin-bottom:2.5rem;position:relative;max-width:560px;margin-left:auto;margin-right:auto}
+
+/* SEARCH BOX */
+.search-box{
+  background:var(--white);border-radius:12px;
+  box-shadow:var(--shadow-lg);
+  max-width:680px;margin:0 auto 2.5rem;
+  display:grid;grid-template-columns:1fr 1fr auto;overflow:hidden;
+  position:relative;
+}
+.search-box select,.search-box input{
+  border:none;padding:1rem 1.2rem;font-family:'Sarabun',sans-serif;
+  font-size:0.95rem;outline:none;color:var(--text);background:var(--white);
+}
+.search-box select{border-right:1px solid #E5E0D5;color:var(--text)}
+.search-box input{border-right:1px solid #E5E0D5}
+.search-box button{
+  background:var(--gold);color:var(--navy);border:none;
+  padding:1rem 1.8rem;font-size:1rem;font-weight:800;
+  transition:background 0.2s;
+}
+.search-box button:hover{background:var(--gold2)}
+
+/* STATS */
+.hero-stats{
+  display:flex;justify-content:center;gap:3rem;flex-wrap:wrap;
+  position:relative;
+}
+.stat-item{text-align:center}
+.stat-num{font-size:1.8rem;font-weight:800;color:var(--gold);line-height:1}
+.stat-lbl{font-size:0.78rem;color:#6A8EA8;margin-top:0.2rem}
+
+/* ===== SECTION ===== */
+.section{padding:4rem 2rem}
+.section-cream{background:var(--cream)}
+.section-white{background:var(--white)}
+.section-navy{background:var(--navy);color:var(--white)}
+.container{max-width:1100px;margin:0 auto}
+.section-head{text-align:center;margin-bottom:2.5rem}
+.section-head h2{
+  font-family:'Playfair Display',serif;
+  font-size:clamp(1.5rem,3vw,2rem);color:var(--navy);margin-bottom:0.5rem;
+}
+.section-head p{color:var(--muted);font-size:0.95rem}
+.section-navy .section-head h2{color:var(--gold)}
+.section-navy .section-head p{color:#7A94A8}
+
+/* ===== CASE TYPE GRID ===== */
+.case-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(130px,1fr));
+  gap:1rem;
+}
+.case-card{
+  background:var(--white);border-radius:10px;
+  padding:1.2rem 0.8rem;text-align:center;
+  border:1.5px solid var(--border);
+  transition:all 0.2s;cursor:pointer;
+}
+.case-card:hover{border-color:var(--gold);box-shadow:0 4px 16px rgba(200,168,75,0.15);transform:translateY(-2px)}
+.case-card.special{border-color:#7C3AED;background:#FAF5FF}
+.case-card.special:hover{border-color:#6C5CE7;box-shadow:0 4px 16px rgba(108,92,231,0.15)}
+.case-icon{font-size:2rem;margin-bottom:0.5rem}
+.case-name{font-size:0.82rem;font-weight:700;color:var(--text)}
+.case-tag{font-size:0.68rem;color:var(--muted);margin-top:0.2rem}
+.case-card.special .case-name{color:#6C5CE7}
+.case-card.special .case-tag{color:#9333EA;background:#F3E8FF;padding:1px 6px;border-radius:10px;display:inline-block}
+
+/* ===== LAWYER CARDS ===== */
+.lawyers-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(280px,1fr));
+  gap:1.5rem;
+}
+.lawyer-card{
+  background:var(--white);border-radius:12px;overflow:hidden;
+  box-shadow:var(--shadow);border:1px solid var(--border);
+  transition:all 0.2s;
+}
+.lawyer-card:hover{box-shadow:var(--shadow-lg);transform:translateY(-3px)}
+.lc-header{
+  background:linear-gradient(135deg,var(--navy),var(--navy3));
+  padding:1.2rem;display:flex;align-items:center;gap:1rem;
+}
+.lc-avatar{
+  width:52px;height:52px;border-radius:50%;
+  background:var(--gold);display:flex;align-items:center;justify-content:center;
+  font-size:1.4rem;border:2px solid rgba(200,168,75,0.5);flex-shrink:0;
+}
+.lc-name{color:var(--white);font-weight:700;font-size:0.95rem;margin-bottom:2px}
+.lc-exp{color:#7A9BB8;font-size:0.78rem}
+.lc-badge-lawyer{
+  background:var(--green);color:#fff;
+  font-size:0.65rem;font-weight:700;padding:2px 7px;border-radius:10px;
+  display:inline-block;margin-top:3px;
+}
+.lc-badge-special{
+  background:#6C5CE7;color:#fff;
+  font-size:0.65rem;font-weight:700;padding:2px 7px;border-radius:10px;
+  display:inline-block;margin-top:3px;
+}
+.lc-body{padding:1rem 1.2rem}
+.lc-specs{display:flex;flex-wrap:wrap;gap:0.3rem;margin-bottom:0.7rem}
+.spec-chip{
+  background:#EEF2FF;color:#3730A3;
+  font-size:0.7rem;font-weight:600;padding:3px 9px;border-radius:20px;
+}
+.spec-chip.special{background:#F3E8FF;color:#6C5CE7}
+.lc-rating{display:flex;align-items:center;gap:0.5rem;margin-bottom:0.5rem}
+.stars{color:#F59E0B;font-size:0.85rem}
+.rating-num{font-size:0.8rem;color:var(--muted)}
+.lc-score{display:flex;align-items:center;gap:0.4rem;margin-bottom:0.8rem;font-size:0.78rem}
+.score-bar-wrap{flex:1;background:#E5E7EB;border-radius:10px;height:6px;overflow:hidden}
+.score-bar{height:100%;border-radius:10px;background:linear-gradient(90deg,var(--gold),var(--gold2))}
+.lc-privacy{
+  display:flex;align-items:center;gap:0.4rem;
+  background:#F3F4F6;border-radius:6px;padding:0.4rem 0.7rem;
+  font-size:0.75rem;color:#6B7280;margin-bottom:0.8rem;
+}
+.lc-btn{
+  width:100%;background:var(--navy);color:var(--white);border:none;
+  padding:0.65rem;border-radius:8px;font-weight:700;font-size:0.85rem;
+  transition:all 0.2s;
+}
+.lc-btn:hover{background:var(--gold);color:var(--navy)}
+
+/* ===== FEATURES ===== */
+.features-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+  gap:1.5rem;
+}
+.feature-card{
+  background:rgba(255,255,255,0.06);border-radius:10px;
+  padding:1.5rem;border:1px solid rgba(255,255,255,0.08);
+}
+.feature-icon{font-size:2rem;margin-bottom:0.8rem}
+.feature-card h3{color:var(--gold);font-size:1rem;margin-bottom:0.4rem}
+.feature-card p{color:#8AACC4;font-size:0.85rem;line-height:1.6}
+
+/* ===== Q&A SECTION ===== */
+.qa-wrap{max-width:760px;margin:0 auto}
+.grace-banner{
+  background:linear-gradient(135deg,rgba(108,92,231,0.12),rgba(108,92,231,0.06));
+  border:1.5px solid rgba(108,92,231,0.35);
+  border-radius:10px;padding:1rem 1.5rem;
+  display:flex;align-items:center;justify-content:space-between;
+  gap:1rem;flex-wrap:wrap;margin-bottom:1.5rem;
+}
+.grace-info h4{color:#6C5CE7;font-size:0.9rem;font-weight:700;margin-bottom:0.2rem}
+.grace-info p{color:#7C6FA0;font-size:0.78rem}
+.btn-grace{
+  background:linear-gradient(135deg,#6C5CE7,#A78BFA);
+  color:#fff;border:none;padding:0.55rem 1.4rem;border-radius:20px;
+  font-weight:700;font-size:0.85rem;white-space:nowrap;
+}
+.btn-grace:hover{opacity:0.9}
+
+.qa-card{
+  background:var(--white);border-radius:10px;border:1px solid var(--border);
+  margin-bottom:1rem;overflow:hidden;
+  box-shadow:0 2px 8px rgba(0,0,0,0.04);
+}
+.qa-card-head{padding:1rem 1.2rem 0.7rem}
+.qa-meta{display:flex;align-items:center;gap:0.5rem;flex-wrap:wrap;margin-bottom:0.5rem}
+.qa-type-badge{
+  font-size:0.7rem;font-weight:700;padding:2px 9px;border-radius:20px;
+}
+.type-civil{background:#DBEAFE;color:#1E40AF}
+.type-criminal{background:#FEE2E2;color:#991B1B}
+.type-heritage{background:#FEF3C7;color:#92400E}
+.type-labour{background:#D1FAE5;color:#065F46}
+.type-admin{background:#EDE9FE;color:#5B21B6}
+.type-corruption{background:#FCE7F3;color:#9D174D}
+.qa-title{font-weight:700;color:var(--text);font-size:0.95rem}
+.qa-by{color:#9CA3AF;font-size:0.75rem;margin-top:0.3rem}
+.qa-answer{
+  padding:0.8rem 1.2rem;
+  border-left:3px solid var(--green);
+  background:#F0FDF4;
+}
+.qa-answer-by{display:flex;align-items:center;gap:0.5rem;margin-bottom:0.4rem;flex-wrap:wrap}
+.qa-answer p{color:#374151;font-size:0.85rem;line-height:1.6}
+.qa-actions{
+  padding:0.6rem 1.2rem;background:#FAFAFA;
+  display:flex;align-items:center;gap:1rem;
+  font-size:0.78rem;color:#9CA3AF;
+}
+.qa-actions button{
+  background:transparent;border:1px solid #E5E7EB;
+  color:#6B7280;padding:0.3rem 0.8rem;border-radius:4px;
+  font-size:0.75rem;font-family:'Sarabun',sans-serif;
+}
+.qa-actions button:hover{background:var(--navy);color:var(--gold);border-color:var(--navy)}
+
+/* ===== MODAL ===== */
+.modal-overlay{
+  position:fixed;inset:0;background:rgba(0,0,0,0.6);
+  z-index:2000;display:none;align-items:center;justify-content:center;
+  padding:1rem;
+}
+.modal-overlay.open{display:flex}
+.modal{
+  background:var(--white);border-radius:14px;
+  max-width:480px;width:100%;padding:2rem;
+  position:relative;box-shadow:0 24px 80px rgba(0,0,0,0.3);
+  max-height:90vh;overflow-y:auto;
+}
+.modal-close{
+  position:absolute;top:1rem;right:1rem;
+  background:none;border:none;font-size:1.3rem;color:var(--muted);
+}
+.modal h3{font-family:'Playfair Display',serif;font-size:1.3rem;margin-bottom:0.4rem;color:var(--navy)}
+.modal p.sub{color:var(--muted);font-size:0.85rem;margin-bottom:1.5rem}
+.form-group{margin-bottom:1rem}
+.form-group label{display:block;font-size:0.82rem;font-weight:700;color:var(--text);margin-bottom:0.3rem}
+.form-group input,.form-group select,.form-group textarea{
+  width:100%;border:1.5px solid var(--border);border-radius:6px;
+  padding:0.65rem 0.9rem;font-family:'Sarabun',sans-serif;font-size:0.9rem;
+  outline:none;transition:border 0.2s;color:var(--text);background:var(--white);
+}
+.form-group input:focus,.form-group select:focus,.form-group textarea:focus{border-color:var(--gold)}
+.form-group textarea{resize:vertical;min-height:80px}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:0.8rem}
+.modal-actions{display:flex;gap:0.8rem;margin-top:1.5rem}
+.modal-actions button{flex:1;padding:0.7rem}
+.modal-check{display:flex;align-items:flex-start;gap:0.5rem;font-size:0.8rem;color:var(--muted);margin-bottom:0.5rem}
+.modal-check input{margin-top:2px;flex-shrink:0}
+.tab-switch{display:flex;background:#F3F4F6;border-radius:8px;padding:3px;margin-bottom:1.5rem}
+.tab-switch button{
+  flex:1;background:none;border:none;padding:0.5rem;font-size:0.85rem;
+  font-weight:600;color:var(--muted);border-radius:6px;transition:all 0.2s;
+}
+.tab-switch button.active{background:var(--white);color:var(--navy);box-shadow:0 1px 4px rgba(0,0,0,0.1)}
+.grace-popup{background:#F5F3FF;border:1.5px dashed #A78BFA;border-radius:10px;padding:1rem;margin-bottom:1rem}
+.grace-popup h4{color:#6C5CE7;font-size:0.9rem;margin-bottom:0.4rem}
+.grace-popup p{font-size:0.8rem;color:#5B4B8A;line-height:1.5}
+.alert{padding:0.7rem 1rem;border-radius:6px;font-size:0.82rem;margin-bottom:1rem;display:none}
+.alert-green{background:#D1FAE5;color:#065F46;border-left:3px solid var(--green)}
+.alert-red{background:#FEE2E2;color:#991B1B;border-left:3px solid var(--red)}
+
+/* ===== DONATE BANNER ===== */
+.donate-section{
+  background:linear-gradient(135deg,#92400E 0%,#B45309 50%,#D97706 100%);
+  padding:3rem 2rem;text-align:center;
+}
+.donate-section h2{font-family:'Playfair Display',serif;color:#fff;font-size:1.8rem;margin-bottom:0.5rem}
+.donate-section p{color:#FDE68A;margin-bottom:1.5rem}
+.btn-donate{
+  background:#fff;color:#92400E;border:none;
+  padding:0.8rem 2.5rem;border-radius:30px;
+  font-weight:800;font-size:1rem;display:inline-flex;align-items:center;gap:0.5rem;
+}
+.btn-donate:hover{background:#FEF3C7}
+
+/* ===== FOOTER ===== */
+footer{
+  background:var(--navy);border-top:2px solid rgba(200,168,75,0.3);
+  padding:2.5rem 2rem 1.5rem;color:#6A8EA8;
+}
+.footer-grid{
+  max-width:1100px;margin:0 auto;
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
+  gap:2rem;margin-bottom:2rem;
+}
+.footer-col h4{color:var(--gold);font-size:0.9rem;margin-bottom:0.8rem}
+.footer-col ul{list-style:none;display:flex;flex-direction:column;gap:0.4rem}
+.footer-col ul li a{font-size:0.82rem;color:#6A8EA8;transition:color 0.2s}
+.footer-col ul li a:hover{color:var(--gold)}
+.footer-logo{font-family:'Playfair Display',serif;color:var(--gold);font-size:1.3rem;margin-bottom:0.5rem}
+.footer-desc{font-size:0.8rem;line-height:1.6;color:#5A7A9A}
+.footer-bottom{
+  max-width:1100px;margin:0 auto;
+  border-top:1px solid rgba(255,255,255,0.06);
+  padding-top:1rem;display:flex;justify-content:space-between;
+  align-items:center;flex-wrap:wrap;gap:0.5rem;font-size:0.78rem;
+}
+.footer-bottom a{color:#5A7A9A}
+.footer-bottom a:hover{color:var(--gold)}
+
+/* ===== TOAST ===== */
+.toast{
+  position:fixed;bottom:2rem;right:2rem;z-index:3000;
+  background:var(--navy);color:var(--white);
+  padding:0.8rem 1.4rem;border-radius:8px;border-left:4px solid var(--green);
+  font-size:0.88rem;font-weight:600;
+  box-shadow:var(--shadow-lg);
+  transform:translateX(200%);transition:transform 0.3s;
+  max-width:320px;
+}
+.toast.show{transform:translateX(0)}
+
+/* ===== LAWYER REGISTER STEPS ===== */
+.steps-wrap{display:flex;gap:0;flex-wrap:wrap;margin-bottom:2rem}
+.step-item{
+  flex:1;min-width:180px;text-align:center;
+  padding:1.5rem 1rem;position:relative;
+}
+.step-item::after{
+  content:'→';position:absolute;right:-0.5rem;top:50%;
+  transform:translateY(-50%);color:var(--muted);font-size:1.2rem;
+}
+.step-item:last-child::after{display:none}
+.step-circle{
+  width:48px;height:48px;border-radius:50%;
+  background:var(--gold);color:var(--navy);
+  font-weight:800;font-size:1.1rem;
+  display:flex;align-items:center;justify-content:center;
+  margin:0 auto 0.8rem;
+}
+.step-title{font-weight:700;font-size:0.88rem;margin-bottom:0.3rem}
+.step-desc{font-size:0.78rem;color:var(--muted)}
+
+/* ===== SCORE DISPLAY ===== */
+.score-badge{
+  display:inline-flex;align-items:center;gap:0.3rem;
+  font-size:0.72rem;font-weight:700;padding:2px 8px;border-radius:10px;
+}
+.score-new{background:#E5E7EB;color:#6B7280}
+.score-blue{background:#DBEAFE;color:#1D4ED8}
+.score-green{background:#D1FAE5;color:#065F46}
+.score-gold{background:#FEF3C7;color:#92400E}
+.score-diamond{background:#EDE9FE;color:#5B21B6}
+
+/* ===== RESPONSIVE ===== */
+@media(max-width:768px){
+  .navbar{padding:0 1rem;height:56px}
+  .navbar-links{display:none}
+  .hero{padding:3rem 1rem 2.5rem}
+  .search-box{grid-template-columns:1fr;border-radius:10px}
+  .search-box select,.search-box input{border-right:none;border-bottom:1px solid #E5E0D5}
+  .hero-stats{gap:1.5rem}
+  .section{padding:2.5rem 1rem}
+  .form-row{grid-template-columns:1fr}
+  .modal{padding:1.5rem}
+  .steps-wrap{flex-direction:column}
+  .step-item::after{display:none}
+}
+@media(max-width:480px){
+  .navbar-logo{font-size:1.1rem}
+  .navbar-actions .btn:first-child{display:none}
+}
+
+/* ===== MOBILE NAV ===== */
+.mobile-nav-btn{
+  display:none;background:none;border:none;color:var(--gold);font-size:1.5rem;
+}
+.mobile-menu{
+  display:none;position:fixed;inset:0;z-index:1500;
+  background:var(--navy);padding:5rem 2rem 2rem;
+  flex-direction:column;gap:1rem;
+}
+.mobile-menu.open{display:flex}
+.mobile-menu a{color:#9FB3C8;font-size:1.1rem;font-weight:600;padding:0.8rem 0;border-bottom:1px solid rgba(255,255,255,0.05)}
+.mobile-menu a:hover{color:var(--gold)}
+.mobile-menu-close{
+  position:absolute;top:1.2rem;right:1.5rem;
+  background:none;border:none;color:var(--gold);font-size:1.8rem;
+}
+@media(max-width:768px){
+  .mobile-nav-btn{display:block}
+  .navbar-actions{display:none}
+}
+</style>
+</head>
+<body>
+
+<!-- ===== MOBILE MENU ===== -->
+<div class="mobile-menu" id="mobileMenu">
+  <button class="mobile-menu-close" onclick="closeMobileMenu()">✕</button>
+  <a href="#home" onclick="closeMobileMenu()">🏠 หน้าแรก</a>
+  <a href="#find" onclick="closeMobileMenu()">⚖️ หาทนาย</a>
+  <a href="#qa" onclick="closeMobileMenu()">💬 ถาม-ตอบ</a>
+  <a href="#knowledge" onclick="closeMobileMenu()">📚 ความรู้กฎหมาย</a>
+  <a href="#register-lawyer" onclick="closeMobileMenu()">📋 สมัครเป็นทนาย</a>
+  <div style="display:flex;gap:0.8rem;padding-top:1rem;">
+    <button class="btn btn-outline" onclick="openModal('loginModal');closeMobileMenu()" style="flex:1">เข้าสู่ระบบ</button>
+    <button class="btn btn-gold" onclick="openModal('registerModal');closeMobileMenu()" style="flex:1">สมัครสมาชิก</button>
+  </div>
+</div>
+
+<!-- ===== NAVBAR ===== -->
+<nav class="navbar" id="home">
+  <div class="navbar-logo">⚖ หาทนาย</div>
+  <div class="navbar-links">
+    <a href="#home" class="active">หน้าแรก</a>
+    <a href="#find">หาทนาย</a>
+    <a href="#qa">ถาม-ตอบ</a>
+    <a href="#knowledge">ความรู้กฎหมาย</a>
+    <a href="#register-lawyer">สมัครเป็นทนาย</a>
+  </div>
+  <div class="navbar-actions">
+    <button class="btn btn-outline" onclick="openModal('loginModal')">เข้าสู่ระบบ</button>
+    <button class="btn btn-gold" onclick="openModal('registerModal')">สมัครสมาชิก</button>
+  </div>
+  <button class="mobile-nav-btn" onclick="openMobileMenu()">☰</button>
+</nav>
+
+<!-- ===== HERO ===== -->
+<section class="hero">
+  <div class="hero-badge">🔒 ระบบจับคู่ทนายผ่านการตรวจสอบทุกคน</div>
+  <h1>ค้นหา<span>ทนายความ</span>ที่ใช่<br>สำหรับคดีของคุณ</h1>
+  <p class="hero-sub">ระบบจับคู่ทนายความมืออาชีพทั่ว 77 จังหวัด รวมทนายเฉพาะทางคดีปกครองและทุจริต ผ่านการตรวจสอบโดยทีมงาน</p>
+
+  <div class="search-box">
+    <select id="searchType">
+      <option value="">ทุกประเภทคดี</option>
+      <option value="civil">คดีแพ่ง</option>
+      <option value="criminal">คดีอาญา</option>
+      <option value="heritage">คดีมรดก</option>
+      <option value="labour">คดีแรงงาน</option>
+      <option value="family">คดีครอบครัว / หย่า</option>
+      <option value="cheque">คดีเช็ค / ฉ้อโกง</option>
+      <option value="administrative">🏛️ คดีปกครอง (เฉพาะทาง)</option>
+      <option value="corruption">⚖️ คดีทุจริต / ศาลอาญาคดีทุจริต</option>
+    </select>
+    <input type="text" id="searchProvince" placeholder="จังหวัดที่เกิดเหตุ เช่น กรุงเทพ...">
+    <button onclick="doSearch()">🔍 ค้นหา</button>
+  </div>
+
+  <div class="hero-stats">
+    <div class="stat-item"><div class="stat-num">500+</div><div class="stat-lbl">ทนายในระบบ</div></div>
+    <div class="stat-item"><div class="stat-num">77</div><div class="stat-lbl">จังหวัดทั่วไทย</div></div>
+    <div class="stat-item"><div class="stat-num">1,240</div><div class="stat-lbl">คดีจับคู่สำเร็จ</div></div>
+    <div class="stat-item"><div class="stat-num">98%</div><div class="stat-lbl">ความพึงพอใจ</div></div>
+  </div>
+</section>
+
+<!-- ===== CASE TYPES ===== -->
+<section class="section section-white" id="cases">
+  <div class="container">
+    <div class="section-head">
+      <h2>เลือกประเภทคดีของคุณ</h2>
+      <p>ทนายความเฉพาะทางพร้อมรับคดีทุกประเภท</p>
+    </div>
+    <div class="case-grid">
+      <div class="case-card" onclick="filterCase('civil')">
+        <div class="case-icon">📄</div>
+        <div class="case-name">คดีแพ่ง</div>
+        <div class="case-tag">สัญญา · หนี้สิน</div>
+      </div>
+      <div class="case-card" onclick="filterCase('criminal')">
+        <div class="case-icon">🔍</div>
+        <div class="case-name">คดีอาญา</div>
+        <div class="case-tag">ผู้เสียหาย · จำเลย</div>
+      </div>
+      <div class="case-card" onclick="filterCase('heritage')">
+        <div class="case-icon">🏛️</div>
+        <div class="case-name">คดีมรดก</div>
+        <div class="case-tag">พินัยกรรม · ทายาท</div>
+      </div>
+      <div class="case-card" onclick="filterCase('labour')">
+        <div class="case-icon">👷</div>
+        <div class="case-name">คดีแรงงาน</div>
+        <div class="case-tag">เลิกจ้าง · ค่าชดเชย</div>
+      </div>
+      <div class="case-card" onclick="filterCase('family')">
+        <div class="case-icon">👨‍👩‍👧</div>
+        <div class="case-name">คดีครอบครัว</div>
+        <div class="case-tag">หย่า · ค่าเลี้ยงดู</div>
+      </div>
+      <div class="case-card" onclick="filterCase('cheque')">
+        <div class="case-icon">💳</div>
+        <div class="case-name">คดีเช็ค / ฉ้อโกง</div>
+        <div class="case-tag">เช็คเด้ง · โกง</div>
+      </div>
+      <div class="case-card special" onclick="filterCase('administrative')">
+        <div class="case-icon">🏢</div>
+        <div class="case-name">คดีปกครอง</div>
+        <div class="case-tag">เฉพาะทาง</div>
+      </div>
+      <div class="case-card special" onclick="filterCase('corruption')">
+        <div class="case-icon">⚖️</div>
+        <div class="case-name">คดีทุจริต</div>
+        <div class="case-tag">ศาลอาญาทุจริต</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== FIND LAWYERS ===== -->
+<section class="section section-cream" id="find">
+  <div class="container">
+    <div class="section-head">
+      <h2>ทนายความในระบบ</h2>
+      <p>ข้อมูลจังหวัดจะแสดงเฉพาะหลังจากระบบอนุมัติการจับคู่เท่านั้น</p>
+    </div>
+    <div class="lawyers-grid" id="lawyersGrid">
+
+      <!-- LAWYER CARD 1 -->
+      <div class="lawyer-card">
+        <div class="lc-header">
+          <div class="lc-avatar">⚖</div>
+          <div>
+            <div class="lc-name">ทนายความ A (นามแฝง)</div>
+            <div class="lc-exp">ประสบการณ์ 15 ปี</div>
+            <span class="lc-badge-lawyer">⚖ ทนายความ ✓</span>
+          </div>
+        </div>
+        <div class="lc-body">
+          <div class="lc-specs">
+            <span class="spec-chip">คดีอาญา</span>
+            <span class="spec-chip">คดีมรดก</span>
+            <span class="spec-chip">คดีแพ่ง</span>
+          </div>
+          <div class="lc-rating">
+            <span class="stars">★★★★★</span>
+            <span class="rating-num">4.9 (32 รีวิว)</span>
+            <span class="score-badge score-gold" style="margin-left:auto">🥇 มืออาชีพ</span>
+          </div>
+          <div class="lc-score">
+            <span style="font-size:0.75rem;color:var(--muted);width:60px">คะแนน 820</span>
+            <div class="score-bar-wrap"><div class="score-bar" style="width:82%"></div></div>
+          </div>
+          <div class="lc-privacy">🔒 จังหวัด: แสดงหลังอนุมัติการจับคู่เท่านั้น</div>
+          <button class="lc-btn" onclick="openModal('caseModal')">ส่งคดีให้พิจารณา (ฟรี)</button>
+        </div>
+      </div>
+
+      <!-- LAWYER CARD 2 - SPECIALIST -->
+      <div class="lawyer-card">
+        <div class="lc-header">
+          <div class="lc-avatar" style="background:#6C5CE7">⚖</div>
+          <div>
+            <div class="lc-name">ทนายความ B (นามแฝง)</div>
+            <div class="lc-exp">ประสบการณ์ 12 ปี</div>
+            <span class="lc-badge-special">🏛️ เชี่ยวชาญปกครอง</span>
+          </div>
+        </div>
+        <div class="lc-body">
+          <div class="lc-specs">
+            <span class="spec-chip special">คดีปกครอง</span>
+            <span class="spec-chip special">คดีทุจริต</span>
+            <span class="spec-chip">คดีอาญา</span>
+          </div>
+          <div class="lc-rating">
+            <span class="stars">★★★★★</span>
+            <span class="rating-num">4.8 (18 รีวิว)</span>
+            <span class="score-badge score-gold" style="margin-left:auto">🥇 มืออาชีพ</span>
+          </div>
+          <div class="lc-score">
+            <span style="font-size:0.75rem;color:var(--muted);width:60px">คะแนน 750</span>
+            <div class="score-bar-wrap"><div class="score-bar" style="width:75%"></div></div>
+          </div>
+          <div class="lc-privacy">🔒 จังหวัด: แสดงหลังอนุมัติการจับคู่เท่านั้น</div>
+          <button class="lc-btn" onclick="openModal('caseModal')">ส่งคดีให้พิจารณา (ฟรี)</button>
+        </div>
+      </div>
+
+      <!-- LAWYER CARD 3 -->
+      <div class="lawyer-card">
+        <div class="lc-header">
+          <div class="lc-avatar">⚖</div>
+          <div>
+            <div class="lc-name">ทนายความ C (นามแฝง)</div>
+            <div class="lc-exp">ประสบการณ์ 8 ปี</div>
+            <span class="lc-badge-lawyer">⚖ ทนายความ ✓</span>
+          </div>
+        </div>
+        <div class="lc-body">
+          <div class="lc-specs">
+            <span class="spec-chip">คดีครอบครัว</span>
+            <span class="spec-chip">หย่า</span>
+            <span class="spec-chip">มรดก</span>
+          </div>
+          <div class="lc-rating">
+            <span class="stars">★★★★☆</span>
+            <span class="rating-num">4.6 (41 รีวิว)</span>
+            <span class="score-badge score-green" style="margin-left:auto">🟢 น่าเชื่อถือ</span>
+          </div>
+          <div class="lc-score">
+            <span style="font-size:0.75rem;color:var(--muted);width:60px">คะแนน 480</span>
+            <div class="score-bar-wrap"><div class="score-bar" style="width:48%"></div></div>
+          </div>
+          <div class="lc-privacy">🔒 จังหวัด: แสดงหลังอนุมัติการจับคู่เท่านั้น</div>
+          <button class="lc-btn" onclick="openModal('caseModal')">ส่งคดีให้พิจารณา (ฟรี)</button>
+        </div>
+      </div>
+
+    </div>
+    <div style="text-align:center;margin-top:2rem">
+      <button class="btn btn-navy btn-lg" onclick="showToast('กำลังโหลดทนายเพิ่มเติม...')">ดูทนายทั้งหมด →</button>
+    </div>
+  </div>
+</section>
+
+<!-- ===== FEATURES ===== -->
+<section class="section section-navy">
+  <div class="container">
+    <div class="section-head">
+      <h2>ทำไมต้องใช้ หาทนาย?</h2>
+      <p>ระบบออกแบบมาเพื่อปกป้องทั้งผู้ว่าจ้างและทนายความ</p>
+    </div>
+    <div class="features-grid">
+      <div class="feature-card">
+        <div class="feature-icon">🔒</div>
+        <h3>ปลอดภัยและเป็นส่วนตัว</h3>
+        <p>ข้อมูลทนายไม่ถูกเปิดเผยจนกว่าระบบจะอนุมัติ ทุกการติดต่อผ่านเวปเท่านั้น</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">✅</div>
+        <h3>ทนายผ่านการตรวจสอบ</h3>
+        <p>ตรวจสอบใบอนุญาตทนายความจากสภาทนายความก่อนเข้าระบบทุกคน</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🛡️</div>
+        <h3>ระบบสอดส่อง Watchdog</h3>
+        <p>ติดตามทุกคดี แจ้งเตือนหากทนายไม่อัปเดตเกิน 30 วัน ป้องกันทิ้งงาน</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">⭐</div>
+        <h3>คะแนนจากผู้ว่าจ้างจริง</h3>
+        <p>ยืนยันตัวตนก่อนให้คะแนน ป้องกัน Fake Review ทุกรีวิวมาจากคดีจริง</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🏛️</div>
+        <h3>ทนายเฉพาะทางคดีปกครอง</h3>
+        <p>รวมทนายเชี่ยวชาญศาลปกครองและศาลอาญาคดีทุจริตและประพฤติมิชอบ</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🆓</div>
+        <h3>ช่วงแรกใช้งานฟรี</h3>
+        <p>ทนายและผู้ว่าจ้างใช้งานได้ฟรีในช่วง Phase 1 ไม่มีค่าใช้จ่ายใด ๆ</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== Q&A SECTION ===== -->
+<section class="section section-white" id="qa">
+  <div class="container">
+    <div class="section-head">
+      <h2>ถาม-ตอบกฎหมายทั่วไป</h2>
+      <p>ไม่ต้องสมัครสมาชิก · กด Grace แล้วถามได้ทันที · ทนายและผู้เชี่ยวชาญตอบ</p>
+    </div>
+    <div class="qa-wrap">
+      <!-- GRACE BANNER -->
+      <div class="grace-banner">
+        <div class="grace-info">
+          <h4>🕊️ ถามฟรีโดยไม่ต้องสมัครสมาชิก</h4>
+          <p>กด "เกรซ" เพื่อยืนยัน แล้วพิมพ์คำถามได้ทันที ชื่อจะแสดงเป็น "ผู้ไม่ประสงค์ออกนาม"</p>
+        </div>
+        <button class="btn-grace" onclick="openModal('graceModal')">🕊️ กด Grace แล้วถาม</button>
+      </div>
+
+      <!-- Q&A CARDS -->
+      <div class="qa-card">
+        <div class="qa-card-head">
+          <div class="qa-meta">
+            <span class="qa-type-badge type-heritage">📋 คดีมรดก</span>
+            <span style="font-size:0.7rem;background:#D1FAE5;color:#065F46;padding:2px 8px;border-radius:20px;font-weight:700">3 คำตอบ</span>
+          </div>
+          <div class="qa-title">บิดาเสียชีวิตโดยไม่ทำพินัยกรรม ลูกนอกสมรสมีสิทธิ์รับมรดกหรือไม่?</div>
+          <div class="qa-by">🕊️ ผู้ไม่ประสงค์ออกนาม · 2 ชั่วโมงที่แล้ว</div>
+        </div>
+        <div class="qa-answer">
+          <div class="qa-answer-by">
+            <span class="lc-badge-lawyer" style="font-size:0.68rem">⚖ ทนายความ ✓</span>
+            <strong style="font-size:0.85rem">ทนายความ A</strong>
+            <span style="font-size:0.75rem;color:#9CA3AF">· 1 ชั่วโมงที่แล้ว</span>
+          </div>
+          <p>ตาม ป.พ.พ. มาตรา 1629 บุตรนอกกฎหมายที่บิดารับรองแล้ว มีสิทธิ์รับมรดกในฐานะทายาทโดยธรรม หากยังไม่ได้รับการรับรองต้องฟ้องคดีพิสูจน์ความเป็นบุตรก่อน แนะนำปรึกษาทนายเพื่อรวบรวมหลักฐาน</p>
+        </div>
+        <div class="qa-actions">
+          <span>👍 15 · 💬 3 คำตอบ</span>
+          <button onclick="showToast('กรุณาล็อกอินเพื่อตอบคำถาม')">🔒 ล็อกอินเพื่อตอบ</button>
+        </div>
+      </div>
+
+      <div class="qa-card">
+        <div class="qa-card-head">
+          <div class="qa-meta">
+            <span class="qa-type-badge type-admin">📋 คดีปกครอง</span>
+            <span style="font-size:0.7rem;background:#FEF3C7;color:#92400E;padding:2px 8px;border-radius:20px;font-weight:700">รอผู้เชี่ยวชาญตอบ</span>
+          </div>
+          <div class="qa-title">ถูกเจ้าหน้าที่รัฐสั่งรื้อถอนสิ่งปลูกสร้างโดยไม่แจ้งล่วงหน้า จะฟ้องศาลปกครองได้หรือไม่?</div>
+          <div class="qa-by">🕊️ ผู้ไม่ประสงค์ออกนาม · 30 นาทีที่แล้ว</div>
+        </div>
+        <div class="qa-actions">
+          <span>💬 0 คำตอบ · รอทนายเฉพาะทางตอบ...</span>
+          <button onclick="showToast('กรุณาล็อกอินเพื่อตอบคำถาม')">🔒 ล็อกอินเพื่อตอบ</button>
+        </div>
+      </div>
+
+      <div class="qa-card">
+        <div class="qa-card-head">
+          <div class="qa-meta">
+            <span class="qa-type-badge type-criminal">📋 คดีอาญา</span>
+            <span style="font-size:0.7rem;background:#D1FAE5;color:#065F46;padding:2px 8px;border-radius:20px;font-weight:700">2 คำตอบ</span>
+          </div>
+          <div class="qa-title">ถูกหลอกโอนเงินออนไลน์ 50,000 บาท อายุความการฟ้องร้องคดีฉ้อโกงคือกี่ปี?</div>
+          <div class="qa-by">🕊️ ผู้ไม่ประสงค์ออกนาม · 3 ชั่วโมงที่แล้ว</div>
+        </div>
+        <div class="qa-answer">
+          <div class="qa-answer-by">
+            <span class="lc-badge-lawyer" style="font-size:0.68rem">⚖ ทนายความ ✓</span>
+            <strong style="font-size:0.85rem">ทนายความ B</strong>
+          </div>
+          <p>คดีฉ้อโกงตาม ป.อ. มาตรา 341 มีอายุความ 10 ปีนับจากวันกระทำผิด แต่ควรแจ้งความโดยเร็วที่สุดเพื่อให้ตำรวจติดตามเส้นทางการเงิน แนะนำเก็บหลักฐาน screenshot ไว้ทั้งหมด</p>
+        </div>
+        <div class="qa-actions">
+          <span>👍 8 · 💬 2 คำตอบ</span>
+          <button onclick="showToast('กรุณาล็อกอินเพื่อตอบคำถาม')">🔒 ล็อกอินเพื่อตอบ</button>
+        </div>
+      </div>
+
+      <div style="text-align:center;margin-top:1.5rem">
+        <button class="btn btn-navy btn-lg" onclick="showToast('กำลังโหลดคำถามเพิ่มเติม...')">ดูคำถามทั้งหมด →</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== KNOWLEDGE ===== -->
+<section class="section section-cream" id="knowledge">
+  <div class="container">
+    <div class="section-head">
+      <h2>ความรู้กฎหมายทั่วไป</h2>
+      <p>บทความและข้อมูลกฎหมายที่มีประโยชน์สำหรับประชาชน</p>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:1.5rem">
+
+      <div style="background:var(--white);border-radius:10px;overflow:hidden;box-shadow:var(--shadow);border:1px solid var(--border)">
+        <div style="background:linear-gradient(135deg,#1E3A5F,#2E5582);padding:1.2rem;color:#7BADD4;font-size:0.75rem;font-weight:700;letter-spacing:1px">📋 คดีมรดก</div>
+        <div style="padding:1.2rem">
+          <h3 style="font-size:1rem;margin-bottom:0.5rem;color:var(--navy)">สิทธิ์รับมรดกของทายาทตาม ป.พ.พ.</h3>
+          <p style="font-size:0.82rem;color:var(--muted);line-height:1.6">ทายาทโดยธรรม 6 ลำดับตามมาตรา 1629 และสิทธิ์ของคู่สมรส ลูกนอกสมรส และผู้รับพินัยกรรม...</p>
+          <a href="#" style="color:var(--gold);font-size:0.82rem;font-weight:700;margin-top:0.8rem;display:block">อ่านต่อ →</a>
+        </div>
+      </div>
+
+      <div style="background:var(--white);border-radius:10px;overflow:hidden;box-shadow:var(--shadow);border:1px solid var(--border)">
+        <div style="background:linear-gradient(135deg,#4A1942,#7B2D8B);padding:1.2rem;color:#C994DA;font-size:0.75rem;font-weight:700;letter-spacing:1px">⚖️ คดีปกครอง</div>
+        <div style="padding:1.2rem">
+          <h3 style="font-size:1rem;margin-bottom:0.5rem;color:var(--navy)">เมื่อหน่วยงานรัฐออกคำสั่งไม่ชอบด้วยกฎหมาย</h3>
+          <p style="font-size:0.82rem;color:var(--muted);line-height:1.6">ขั้นตอนการฟ้องศาลปกครอง อายุความ และประเภทคดีที่ศาลปกครองมีอำนาจพิจารณา...</p>
+          <a href="#" style="color:var(--gold);font-size:0.82rem;font-weight:700;margin-top:0.8rem;display:block">อ่านต่อ →</a>
+        </div>
+      </div>
+
+      <div style="background:var(--white);border-radius:10px;overflow:hidden;box-shadow:var(--shadow);border:1px solid var(--border)">
+        <div style="background:linear-gradient(135deg,#7B1C1C,#B22222);padding:1.2rem;color:#F4A0A0;font-size:0.75rem;font-weight:700;letter-spacing:1px">🏛️ คดีทุจริต</div>
+        <div style="padding:1.2rem">
+          <h3 style="font-size:1rem;margin-bottom:0.5rem;color:var(--navy)">ศาลอาญาคดีทุจริตและประพฤติมิชอบ</h3>
+          <p style="font-size:0.82rem;color:var(--muted);line-height:1.6">ขอบเขตอำนาจ ประเภทคดี และสิทธิ์ของผู้ต้องหาในคดีทุจริตตาม พ.ร.บ. มาตรการฯ...</p>
+          <a href="#" style="color:var(--gold);font-size:0.82rem;font-weight:700;margin-top:0.8rem;display:block">อ่านต่อ →</a>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ===== REGISTER LAWYER ===== -->
+<section class="section section-white" id="register-lawyer">
+  <div class="container">
+    <div class="section-head">
+      <h2>สมัครเป็นทนายความในระบบ</h2>
+      <p>ช่วงแรกใช้งานฟรีทุกฟีเจอร์ · ทนายทุกท่านผ่านการตรวจสอบโดยทีมงาน</p>
+    </div>
+    <div class="steps-wrap">
+      <div class="step-item">
+        <div class="step-circle">1</div>
+        <div class="step-title">กรอกใบสมัคร</div>
+        <div class="step-desc">ชื่อ-นามสกุล · เบอร์ใบอนุญาต · ความเชี่ยวชาญ</div>
+      </div>
+      <div class="step-item">
+        <div class="step-circle">2</div>
+        <div class="step-title">แนบเอกสาร</div>
+        <div class="step-desc">ใบอนุญาตทนายความ · บัตรประชาชน</div>
+      </div>
+      <div class="step-item">
+        <div class="step-circle">3</div>
+        <div class="step-title">รอการอนุมัติ</div>
+        <div class="step-desc">ทีมงานตรวจสอบภายใน 24-48 ชั่วโมง</div>
+      </div>
+      <div class="step-item">
+        <div class="step-circle">4</div>
+        <div class="step-title">เริ่มรับคดี</div>
+        <div class="step-desc">ปรากฏในระบบ · รับแจ้งเตือนคดีใหม่</div>
+      </div>
+    </div>
+    <div style="text-align:center">
+      <button class="btn btn-gold btn-lg" onclick="openModal('lawyerRegModal')">📋 สมัครเป็นทนายในระบบ (ฟรี)</button>
+      <p style="margin-top:0.8rem;font-size:0.82rem;color:var(--muted)">ช่วงแรกไม่มีค่าใช้จ่าย · เปิดระบบค่านายหน้าในภายหลัง</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===== DONATE ===== -->
+<section class="donate-section">
+  <div class="container">
+    <h2>❤️ สนับสนุนเวป หาทนาย</h2>
+    <p>หากเวปนี้เป็นประโยชน์สำหรับคุณ ช่วยสนับสนุนเราได้เลย</p>
+    <button class="btn-donate" onclick="openModal('donateModal')">❤️ Donate สนับสนุนเรา</button>
+  </div>
+</section>
+
+<!-- ===== FOOTER ===== -->
+<footer>
+  <div class="footer-grid">
+    <div class="footer-col">
+      <div class="footer-logo">⚖ หาทนาย</div>
+      <p class="footer-desc">ระบบค้นหาและจับคู่ทนายความทั่วประเทศไทย เปิดให้บริการฟรีในช่วงเริ่มต้น</p>
+    </div>
+    <div class="footer-col">
+      <h4>บริการ</h4>
+      <ul>
+        <li><a href="#find">ค้นหาทนาย</a></li>
+        <li><a href="#qa">ถาม-ตอบกฎหมาย</a></li>
+        <li><a href="#knowledge">ความรู้กฎหมาย</a></li>
+        <li><a href="#register-lawyer">สมัครเป็นทนาย</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>ประเภทคดี</h4>
+      <ul>
+        <li><a href="#cases">คดีแพ่ง / อาญา</a></li>
+        <li><a href="#cases">คดีมรดก / ครอบครัว</a></li>
+        <li><a href="#cases">คดีแรงงาน / เช็ค</a></li>
+        <li><a href="#cases">คดีปกครอง / ทุจริต</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>ข้อมูลทั่วไป</h4>
+      <ul>
+        <li><a href="#">นโยบายความเป็นส่วนตัว</a></li>
+        <li><a href="#">เงื่อนไขการใช้งาน</a></li>
+        <li><a href="#">PDPA &amp; Cookie Policy</a></li>
+        <li><a href="#">ติดต่อเรา</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <span>© 2567 หาทนาย (HaThanai.com) · สงวนลิขสิทธิ์</span>
+    <span>พัฒนาเพื่อประชาชนชาวไทย 🇹🇭</span>
+  </div>
+</footer>
+
+<!-- ===== TOAST ===== -->
+<div class="toast" id="toast"></div>
+
+<!-- ===== MODAL: LOGIN ===== -->
+<div class="modal-overlay" id="loginModal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('loginModal')">✕</button>
+    <h3>เข้าสู่ระบบ</h3>
+    <p class="sub">สมาชิกและทนายความในระบบหาทนาย</p>
+    <div class="tab-switch">
+      <button class="active">สมาชิก / ผู้ใช้</button>
+      <button onclick="this.parentElement.querySelectorAll('button').forEach(b=>b.classList.remove('active'));this.classList.add('active')">ทนายความ</button>
+    </div>
+    <div class="form-group">
+      <label>อีเมล</label>
+      <input type="email" placeholder="your@email.com">
+    </div>
+    <div class="form-group">
+      <label>รหัสผ่าน</label>
+      <input type="password" placeholder="••••••••">
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-gold" style="flex:1;padding:0.7rem" onclick="showToast('เข้าสู่ระบบสำเร็จ ✅');closeModal('loginModal')">เข้าสู่ระบบ</button>
+    </div>
+    <p style="text-align:center;margin-top:1rem;font-size:0.82rem;color:var(--muted)">ยังไม่มีบัญชี? <a href="#" onclick="closeModal('loginModal');openModal('registerModal')" style="color:var(--gold);font-weight:700">สมัครสมาชิก</a></p>
+  </div>
+</div>
+
+<!-- ===== MODAL: REGISTER ===== -->
+<div class="modal-overlay" id="registerModal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('registerModal')">✕</button>
+    <h3>สมัครสมาชิก</h3>
+    <p class="sub">สมัครสมาชิกเพื่อใช้งานครบทุกฟีเจอร์</p>
+    <div class="form-group">
+      <label>ชื่อ-นามสกุล</label>
+      <input type="text" placeholder="ชื่อจริงของคุณ">
+    </div>
+    <div class="form-group">
+      <label>อีเมล</label>
+      <input type="email" placeholder="your@email.com">
+    </div>
+    <div class="form-group">
+      <label>รหัสผ่าน</label>
+      <input type="password" placeholder="อย่างน้อย 8 ตัวอักษร">
+    </div>
+    <div class="modal-check">
+      <input type="checkbox" id="chkTerms">
+      <label for="chkTerms">ฉันยอมรับ <a href="#" style="color:var(--gold)">เงื่อนไขการใช้งาน</a> และ <a href="#" style="color:var(--gold)">นโยบายความเป็นส่วนตัว</a></label>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-gold" style="flex:1;padding:0.7rem" onclick="showToast('สมัครสมาชิกสำเร็จ ✅ กรุณายืนยันอีเมล');closeModal('registerModal')">สมัครสมาชิก</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== MODAL: GRACE ===== -->
+<div class="modal-overlay" id="graceModal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('graceModal')">✕</button>
+    <h3>🕊️ ยืนยัน Grace ก่อนถาม</h3>
+    <p class="sub">ไม่ต้องสมัครสมาชิก · คำถามแสดงชื่อ "ผู้ไม่ประสงค์ออกนาม"</p>
+    <div class="grace-popup">
+      <h4>ข้อตกลงก่อนถามคำถาม</h4>
+      <p>• คำถามจะแสดงในระบบแบบสาธารณะ<br>• ห้ามโพสต์ข้อมูลส่วนตัว เบอร์โทร หรือที่อยู่<br>• ระบบบันทึก Session Token ชั่วคราวเพื่อป้องกัน Spam<br>• จำกัด 3 คำถาม / 24 ชั่วโมง</p>
+    </div>
+    <div class="form-group">
+      <label>เลือกประเภทคดี</label>
+      <select>
+        <option>คดีแพ่ง</option>
+        <option>คดีอาญา</option>
+        <option>คดีมรดก</option>
+        <option>คดีแรงงาน</option>
+        <option>คดีครอบครัว</option>
+        <option>คดีเช็ค / ฉ้อโกง</option>
+        <option>คดีปกครอง (เฉพาะทาง)</option>
+        <option>คดีทุจริต / ศาลอาญาคดีทุจริต</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label>คำถามของคุณ</label>
+      <textarea placeholder="อธิบายปัญหากฎหมายที่ต้องการถาม..."></textarea>
+    </div>
+    <div class="modal-check">
+      <input type="checkbox" id="chkGrace">
+      <label for="chkGrace">ฉันรับทราบข้อตกลงข้างต้น และยืนยันว่าเป็นมนุษย์ (Grace)</label>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-outline" style="flex:0.4;padding:0.7rem" onclick="closeModal('graceModal')">ยกเลิก</button>
+      <button class="btn btn-gold" style="flex:1;padding:0.7rem" onclick="showToast('โพสต์คำถามสำเร็จ ✅ รอทนายตอบ');closeModal('graceModal')">✅ ยืนยัน Grace &amp; ถาม</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== MODAL: SUBMIT CASE ===== -->
+<div class="modal-overlay" id="caseModal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('caseModal')">✕</button>
+    <h3>ส่งคดีให้ทนายพิจารณา</h3>
+    <p class="sub">กรอกรายละเอียดคดี · ระบบจะจับคู่ทนายที่เหมาะสมให้ · ฟรีในช่วงนี้</p>
+    <div class="form-group">
+      <label>ชื่อ-นามสกุลผู้ติดต่อ</label>
+      <input type="text" placeholder="ชื่อ-นามสกุลของคุณ">
+    </div>
+    <div class="form-group">
+      <label>อีเมล (สำหรับรับการแจ้งเตือน)</label>
+      <input type="email" placeholder="your@email.com">
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>ประเภทคดี</label>
+        <select>
+          <option>คดีแพ่ง</option>
+          <option>คดีอาญา</option>
+          <option>คดีมรดก</option>
+          <option>คดีแรงงาน</option>
+          <option>คดีครอบครัว / หย่า</option>
+          <option>คดีเช็ค / ฉ้อโกง</option>
+          <option>คดีปกครอง (เฉพาะทาง)</option>
+          <option>คดีทุจริต / ศาลอาญาคดีทุจริต</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>จังหวัดที่เกิดเหตุ</label>
+        <input type="text" placeholder="เช่น กรุงเทพมหานคร">
+      </div>
+    </div>
+    <div class="form-group">
+      <label>รายละเอียดคดี</label>
+      <textarea placeholder="อธิบายข้อเท็จจริงและปัญหาที่ต้องการความช่วยเหลือ..." style="min-height:100px"></textarea>
+    </div>
+    <div class="modal-check">
+      <input type="checkbox" id="chkCase">
+      <label for="chkCase">ฉันยืนยันว่าข้อมูลที่ให้ถูกต้อง และยอมรับข้อตกลงการใช้งาน</label>
+    </div>
+    <div style="background:#FEF3C7;border-radius:6px;padding:0.7rem 1rem;margin-bottom:1rem;font-size:0.8rem;color:#92400E">
+      🆓 <strong>ช่วงนี้ไม่มีค่าใช้จ่าย</strong> · ระบบจะจับคู่ทนายที่ตรงกับคดีของคุณและแจ้งผลทางอีเมล
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-outline" style="flex:0.4;padding:0.7rem" onclick="closeModal('caseModal')">ยกเลิก</button>
+      <button class="btn btn-gold" style="flex:1;padding:0.7rem" onclick="showToast('ส่งคดีสำเร็จ ✅ รอทีมงานติดต่อกลับ');closeModal('caseModal')">📤 ส่งคดี (ฟรี)</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== MODAL: LAWYER REGISTER ===== -->
+<div class="modal-overlay" id="lawyerRegModal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('lawyerRegModal')">✕</button>
+    <h3>สมัครเป็นทนายในระบบ</h3>
+    <p class="sub">ฟรีในช่วง Phase 1 · ตรวจสอบภายใน 24-48 ชั่วโมง</p>
+    <div class="form-row">
+      <div class="form-group">
+        <label>ชื่อ</label>
+        <input type="text" placeholder="ชื่อ">
+      </div>
+      <div class="form-group">
+        <label>นามสกุล</label>
+        <input type="text" placeholder="นามสกุล">
+      </div>
+    </div>
+    <div class="form-group">
+      <label>อีเมล</label>
+      <input type="email" placeholder="lawyer@email.com">
+    </div>
+    <div class="form-group">
+      <label>เลขใบอนุญาตทนายความ</label>
+      <input type="text" placeholder="เลขที่ใบอนุญาต สภาทนายความ">
+    </div>
+    <div class="form-group">
+      <label>จังหวัดที่ปฏิบัติงาน (ไม่แสดงต่อสาธารณะ)</label>
+      <input type="text" placeholder="จังหวัด">
+    </div>
+    <div class="form-group">
+      <label>ความเชี่ยวชาญ (เลือกได้หลายข้อ)</label>
+      <select multiple style="height:100px">
+        <option>คดีแพ่ง</option>
+        <option>คดีอาญา</option>
+        <option>คดีมรดก</option>
+        <option>คดีแรงงาน</option>
+        <option>คดีครอบครัว / หย่า</option>
+        <option>คดีเช็ค / ฉ้อโกง</option>
+        <option>คดีปกครอง (เฉพาะทาง)</option>
+        <option>คดีทุจริต / ศาลอาญาคดีทุจริต</option>
+      </select>
+      <span style="font-size:0.75rem;color:var(--muted)">กด Ctrl+คลิก เพื่อเลือกหลายข้อ</span>
+    </div>
+    <div class="form-group">
+      <label>ประสบการณ์ (ปี)</label>
+      <input type="number" placeholder="เช่น 10">
+    </div>
+    <div class="modal-check">
+      <input type="checkbox" id="chkLawyer">
+      <label for="chkLawyer">ฉันรับรองว่ามีใบอนุญาตทนายความถูกต้องจากสภาทนายความแห่งประเทศไทย</label>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-outline" style="flex:0.4;padding:0.7rem" onclick="closeModal('lawyerRegModal')">ยกเลิก</button>
+      <button class="btn btn-gold" style="flex:1;padding:0.7rem" onclick="showToast('ส่งใบสมัครสำเร็จ ✅ รอทีมงานตรวจสอบภายใน 48 ชม.');closeModal('lawyerRegModal')">📋 ส่งใบสมัคร</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== MODAL: DONATE ===== -->
+<div class="modal-overlay" id="donateModal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('donateModal')">✕</button>
+    <h3>❤️ สนับสนุนเวป หาทนาย</h3>
+    <p class="sub">ทุกการสนับสนุนช่วยให้เราพัฒนาระบบต่อไปได้</p>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:0.6rem;margin-bottom:1rem">
+      <button onclick="setDonate(50)" style="background:#FEF3C7;border:1.5px solid #FCD34D;border-radius:6px;padding:0.6rem;font-weight:700;color:#92400E">฿50</button>
+      <button onclick="setDonate(100)" style="background:#FEF3C7;border:1.5px solid #FCD34D;border-radius:6px;padding:0.6rem;font-weight:700;color:#92400E">฿100</button>
+      <button onclick="setDonate(500)" style="background:#FEF3C7;border:1.5px solid #FCD34D;border-radius:6px;padding:0.6rem;font-weight:700;color:#92400E">฿500</button>
+    </div>
+    <div class="form-group">
+      <label>จำนวนเงิน (บาท)</label>
+      <input type="number" id="donateAmount" placeholder="ระบุจำนวน" value="100">
+    </div>
+    <div class="form-group">
+      <label>ข้อความ (ไม่บังคับ)</label>
+      <input type="text" placeholder="ขอให้โชคดี สนับสนุนเวปที่ดีมากครับ...">
+    </div>
+    <div style="background:#F0FDF4;border-radius:8px;padding:1rem;text-align:center;margin-bottom:1rem;border:1px solid #BBF7D0">
+      <div style="font-size:0.8rem;color:#065F46;margin-bottom:0.3rem">PromptPay / QR Code</div>
+      <div style="font-size:1.2rem;font-weight:800;color:var(--green)">0XX-XXX-XXXX</div>
+      <div style="font-size:0.75rem;color:#6B7280;margin-top:0.2rem">หาทนาย HaThanai</div>
+    </div>
+    <button class="btn btn-green" style="width:100%;padding:0.75rem;font-size:0.95rem" onclick="showToast('ขอบคุณสำหรับการสนับสนุน ❤️');closeModal('donateModal')">❤️ ยืนยันการ Donate</button>
+  </div>
+</div>
+
+<script>
+// ===== MODAL =====
+function openModal(id){document.getElementById(id).classList.add('open')}
+function closeModal(id){document.getElementById(id).classList.remove('open')}
+document.querySelectorAll('.modal-overlay').forEach(o=>{
+  o.addEventListener('click',e=>{if(e.target===o)o.classList.remove('open')})
+})
+
+// ===== TOAST =====
+function showToast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg;t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),3500);
+}
+
+// ===== MOBILE MENU =====
+function openMobileMenu(){document.getElementById('mobileMenu').classList.add('open')}
+function closeMobileMenu(){document.getElementById('mobileMenu').classList.remove('open')}
+
+// ===== SEARCH =====
+function doSearch(){
+  const type=document.getElementById('searchType').value;
+  const prov=document.getElementById('searchProvince').value;
+  showToast('กำลังค้นหา'+(prov?' ใน'+prov:'')+(type?' ประเภท'+document.getElementById('searchType').options[document.getElementById('searchType').selectedIndex].text:'')+'...');
+  document.getElementById('find').scrollIntoView({behavior:'smooth'});
+}
+
+// ===== CASE FILTER =====
+function filterCase(type){
+  document.getElementById('searchType').value=type;
+  showToast('กรองแสดงทนาย: '+type);
+  document.getElementById('find').scrollIntoView({behavior:'smooth'});
+}
+
+// ===== DONATE =====
+function setDonate(n){document.getElementById('donateAmount').value=n}
+
+// ===== NAVBAR ACTIVE =====
+window.addEventListener('scroll',()=>{
+  const sections=['home','find','qa','knowledge','register-lawyer'];
+  const links=document.querySelectorAll('.navbar-links a');
+  let cur='';
+  sections.forEach(id=>{
+    const el=document.getElementById(id);
+    if(el&&window.scrollY>=el.offsetTop-80)cur='#'+id;
+  });
+  links.forEach(l=>{
+    l.classList.toggle('active',l.getAttribute('href')===cur);
+  });
+});
+</script>
+</body>
+</html>
