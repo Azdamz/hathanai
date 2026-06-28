@@ -487,8 +487,9 @@ footer{
     <a href="#register-lawyer">สมัครเป็นทนาย</a>
   </div>
   <div class="navbar-actions">
-    <button class="btn btn-outline" onclick="openModal('loginModal')">เข้าสู่ระบบ</button>
-    <button class="btn btn-gold" onclick="openModal('registerModal')">สมัครสมาชิก</button>
+    <button class="btn btn-outline" id="navLoginBtn" onclick="openModal('loginModal')">เข้าสู่ระบบ</button>
+    <button class="btn btn-gold" id="navRegBtn" onclick="openModal('registerModal')">สมัครสมาชิก</button>
+    <div id="navUserChip" style="display:none;align-items:center;gap:0.4rem;background:rgba(200,168,75,0.1);border:1px solid rgba(200,168,75,0.3);border-radius:20px;padding:0.3rem 0.8rem"></div>
   </div>
   <button class="mobile-nav-btn" onclick="openMobileMenu()">☰</button>
 </nav>
@@ -731,14 +732,20 @@ footer{
       <p>ไม่ต้องสมัครสมาชิก · กด Grace แล้วถามได้ทันที · ทนายและผู้เชี่ยวชาญตอบ</p>
     </div>
     <div class="qa-wrap">
+      <!-- USER POINT BAR (แสดงเมื่อล็อกอิน) -->
+      <div id="userPointBar" style="margin-bottom:1rem"></div>
+
       <!-- GRACE BANNER -->
       <div class="grace-banner">
         <div class="grace-info">
           <h4>🕊️ ถามฟรีโดยไม่ต้องสมัครสมาชิก</h4>
-          <p>กด "เกรซ" เพื่อยืนยัน แล้วพิมพ์คำถามได้ทันที ชื่อจะแสดงเป็น "ผู้ไม่ประสงค์ออกนาม"</p>
+          <p>กด "เกรซ" เพื่อยืนยัน แล้วพิมพ์คำถามได้ทันที · จำกัด 3 คำถาม/วัน</p>
         </div>
-        <button class="btn-grace" onclick="openModal('graceModal')">🕊️ กด Grace แล้วถาม</button>
+        <button class="btn-grace" onclick="activateGrace()">🕊️ กด Grace แล้วถาม</button>
       </div>
+
+      <!-- DYNAMIC Q&A (จาก localStorage) -->
+      <div id="dynamicQA"></div>
 
       <!-- Q&A CARDS -->
       <div class="qa-card">
@@ -943,20 +950,16 @@ footer{
     <button class="modal-close" onclick="closeModal('loginModal')">✕</button>
     <h3>เข้าสู่ระบบ</h3>
     <p class="sub">สมาชิกและทนายความในระบบหาทนาย</p>
-    <div class="tab-switch">
-      <button class="active">สมาชิก / ผู้ใช้</button>
-      <button onclick="this.parentElement.querySelectorAll('button').forEach(b=>b.classList.remove('active'));this.classList.add('active')">ทนายความ</button>
-    </div>
     <div class="form-group">
       <label>อีเมล</label>
-      <input type="email" placeholder="your@email.com">
+      <input type="email" id="loginEmail" placeholder="your@email.com">
     </div>
     <div class="form-group">
       <label>รหัสผ่าน</label>
-      <input type="password" placeholder="••••••••">
+      <input type="password" id="loginPass" placeholder="••••••••">
     </div>
     <div class="modal-actions">
-      <button class="btn btn-gold" style="flex:1;padding:0.7rem" onclick="showToast('เข้าสู่ระบบสำเร็จ ✅');closeModal('loginModal')">เข้าสู่ระบบ</button>
+      <button class="btn btn-gold" style="flex:1;padding:0.7rem" onclick="doLogin()">เข้าสู่ระบบ</button>
     </div>
     <p style="text-align:center;margin-top:1rem;font-size:0.82rem;color:var(--muted)">ยังไม่มีบัญชี? <a href="#" onclick="closeModal('loginModal');openModal('registerModal')" style="color:var(--gold);font-weight:700">สมัครสมาชิก</a></p>
   </div>
@@ -967,25 +970,30 @@ footer{
   <div class="modal">
     <button class="modal-close" onclick="closeModal('registerModal')">✕</button>
     <h3>สมัครสมาชิก</h3>
-    <p class="sub">สมัครสมาชิกเพื่อใช้งานครบทุกฟีเจอร์</p>
+    <p class="sub">สมัครฟรี · รับยืนยันอีเมล · เริ่มสะสมแต้มได้ทันที</p>
+    <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:0.3rem;margin-bottom:1rem;padding:0.8rem;background:#F5F3FF;border-radius:8px">
+      ${[{b:'🌱',n:'มือใหม่',p:'0'},{b:'🔵',n:'ทั่วไป',p:'10'},{b:'🟢',n:'ผู้ช่วย',p:'30'},{b:'🥇',n:'ผู้เชี่ยวชาญ',p:'80'},{b:'💎',n:'กูรู',p:'200'}].map(l=>`
+      <div style="text-align:center;font-size:0.7rem;color:#5B4B8A"><div style="font-size:1.1rem">${l.b}</div><div style="font-weight:700">${l.n}</div><div style="color:#9CA3AF">${l.p}+ แต้ม</div></div>`).join('')}
+    </div>
     <div class="form-group">
       <label>ชื่อ-นามสกุล</label>
-      <input type="text" placeholder="ชื่อจริงของคุณ">
+      <input type="text" id="regName" placeholder="ชื่อจริงของคุณ">
     </div>
     <div class="form-group">
       <label>อีเมล</label>
-      <input type="email" placeholder="your@email.com">
+      <input type="email" id="regEmail" placeholder="your@email.com">
     </div>
     <div class="form-group">
-      <label>รหัสผ่าน</label>
-      <input type="password" placeholder="อย่างน้อย 8 ตัวอักษร">
+      <label>รหัสผ่าน (อย่างน้อย 8 ตัวอักษร)</label>
+      <input type="password" id="regPass" placeholder="••••••••">
     </div>
     <div class="modal-check">
       <input type="checkbox" id="chkTerms">
       <label for="chkTerms">ฉันยอมรับ <a href="#" style="color:var(--gold)">เงื่อนไขการใช้งาน</a> และ <a href="#" style="color:var(--gold)">นโยบายความเป็นส่วนตัว</a></label>
     </div>
+    <div class="alert alert-red" id="regError" style="display:none"></div>
     <div class="modal-actions">
-      <button class="btn btn-gold" style="flex:1;padding:0.7rem" onclick="showToast('สมัครสมาชิกสำเร็จ ✅ กรุณายืนยันอีเมล');closeModal('registerModal')">สมัครสมาชิก</button>
+      <button class="btn btn-gold" style="flex:1;padding:0.7rem" onclick="doRegister()">สมัครสมาชิก & รับยืนยันอีเมล</button>
     </div>
   </div>
 </div>
@@ -995,35 +1003,38 @@ footer{
   <div class="modal">
     <button class="modal-close" onclick="closeModal('graceModal')">✕</button>
     <h3>🕊️ ยืนยัน Grace ก่อนถาม</h3>
-    <p class="sub">ไม่ต้องสมัครสมาชิก · คำถามแสดงชื่อ "ผู้ไม่ประสงค์ออกนาม"</p>
+    <p class="sub">ไม่ต้องสมัครสมาชิก · แสดงชื่อ "ผู้ไม่ประสงค์ออกนาม"</p>
     <div class="grace-popup">
       <h4>ข้อตกลงก่อนถามคำถาม</h4>
-      <p>• คำถามจะแสดงในระบบแบบสาธารณะ<br>• ห้ามโพสต์ข้อมูลส่วนตัว เบอร์โทร หรือที่อยู่<br>• ระบบบันทึก Session Token ชั่วคราวเพื่อป้องกัน Spam<br>• จำกัด 3 คำถาม / 24 ชั่วโมง</p>
+      <p>• คำถามจะแสดงในระบบแบบสาธารณะ<br>• <strong style="color:#C0392B">ห้ามระบุเบอร์โทร LINE ID หรือข้อมูลติดต่อส่วนตัว</strong><br>• ระบบจะซ่อนข้อมูลติดต่ออัตโนมัติหากตรวจพบ<br>• จำกัด 3 คำถาม / 24 ชั่วโมง</p>
+    </div>
+    <div id="qaBlockWarn" style="display:none;background:#FEE2E2;border-left:3px solid #C0392B;border-radius:6px;padding:0.7rem 1rem;margin-bottom:0.8rem;font-size:0.82rem;color:#991B1B">
+      ❌ ตรวจพบข้อมูลติดต่อส่วนตัว (เบอร์โทร/LINE/อีเมล) — กรุณาลบออกก่อนส่ง
     </div>
     <div class="form-group">
       <label>เลือกประเภทคดี</label>
-      <select>
-        <option>คดีแพ่ง</option>
-        <option>คดีอาญา</option>
-        <option>คดีมรดก</option>
-        <option>คดีแรงงาน</option>
-        <option>คดีครอบครัว</option>
-        <option>คดีเช็ค / ฉ้อโกง</option>
-        <option>คดีปกครอง (เฉพาะทาง)</option>
-        <option>คดีทุจริต / ศาลอาญาคดีทุจริต</option>
+      <select id="graceType">
+        <option value="civil">คดีแพ่ง</option>
+        <option value="criminal">คดีอาญา</option>
+        <option value="heritage">คดีมรดก</option>
+        <option value="labour">คดีแรงงาน</option>
+        <option value="family">คดีครอบครัว</option>
+        <option value="cheque">คดีเช็ค / ฉ้อโกง</option>
+        <option value="administrative">คดีปกครอง (เฉพาะทาง)</option>
+        <option value="corruption">คดีทุจริต / ศาลอาญาคดีทุจริต</option>
       </select>
     </div>
     <div class="form-group">
       <label>คำถามของคุณ</label>
-      <textarea placeholder="อธิบายปัญหากฎหมายที่ต้องการถาม..."></textarea>
+      <textarea id="graceText" placeholder="อธิบายปัญหากฎหมาย... (ห้ามระบุเบอร์โทร LINE หรือข้อมูลติดต่อ)" oninput="checkContactRealtime(this)"></textarea>
     </div>
     <div class="modal-check">
-      <input type="checkbox" id="chkGrace">
-      <label for="chkGrace">ฉันรับทราบข้อตกลงข้างต้น และยืนยันว่าเป็นมนุษย์ (Grace)</label>
+      <input type="checkbox" id="graceCheckbox">
+      <label for="graceCheckbox">ฉันรับทราบข้อตกลง และจะไม่ใส่ข้อมูลติดต่อส่วนตัวในคำถาม</label>
     </div>
     <div class="modal-actions">
       <button class="btn btn-outline" style="flex:0.4;padding:0.7rem" onclick="closeModal('graceModal')">ยกเลิก</button>
-      <button class="btn btn-gold" style="flex:1;padding:0.7rem" onclick="showToast('โพสต์คำถามสำเร็จ ✅ รอทนายตอบ');closeModal('graceModal')">✅ ยืนยัน Grace &amp; ถาม</button>
+      <button class="btn btn-gold" style="flex:1;padding:0.7rem" onclick="submitGraceQuestion()">✅ ยืนยัน Grace & ถาม</button>
     </div>
   </div>
 </div>
@@ -1069,12 +1080,15 @@ footer{
       <input type="checkbox" id="chkCase">
       <label for="chkCase">ฉันยืนยันว่าข้อมูลที่ให้ถูกต้อง และยอมรับข้อตกลงการใช้งาน</label>
     </div>
+    <div id="caseBlockWarn" style="display:none;background:#FEE2E2;border-left:3px solid #C0392B;border-radius:6px;padding:0.7rem 1rem;margin-bottom:0.8rem;font-size:0.82rem;color:#991B1B">
+      ❌ ตรวจพบข้อมูลติดต่อ (เบอร์โทร/LINE) — กรุณาลบออกก่อนส่ง ระบบจะซ่อนข้อมูลนี้อัตโนมัติ
+    </div>
     <div style="background:#FEF3C7;border-radius:6px;padding:0.7rem 1rem;margin-bottom:1rem;font-size:0.8rem;color:#92400E">
       🆓 <strong>ช่วงนี้ไม่มีค่าใช้จ่าย</strong> · ระบบจะจับคู่ทนายที่ตรงกับคดีของคุณและแจ้งผลทางอีเมล
     </div>
     <div class="modal-actions">
       <button class="btn btn-outline" style="flex:0.4;padding:0.7rem" onclick="closeModal('caseModal')">ยกเลิก</button>
-      <button class="btn btn-gold" style="flex:1;padding:0.7rem" onclick="showToast('ส่งคดีสำเร็จ ✅ รอทีมงานติดต่อกลับ');closeModal('caseModal')">📤 ส่งคดี (ฟรี)</button>
+      <button class="btn btn-gold" style="flex:1;padding:0.7rem" onclick="submitCase()">📤 ส่งคดี (ฟรี)</button>
     </div>
   </div>
 </div>
@@ -1165,53 +1179,604 @@ footer{
 </div>
 
 <script>
+/* ============================================================
+   หาทนาย — USER SYSTEM v2
+   ฟีเจอร์:
+   1. สมัครสมาชิก + จำลองการยืนยันอีเมล
+   2. ระบบ Login / Logout พร้อม Session (localStorage)
+   3. ระดับผู้ใช้อัตโนมัติจากการตอบ Q&A (5 ระดับ)
+   4. ป้องกันการโพสต์ข้อมูลติดต่อ (เบอร์/LINE/Telegram ฯลฯ)
+   5. Grace system สำหรับถามแบบไม่สมัครสมาชิก
+   ============================================================ */
+
+// ===== USER LEVELS =====
+const LEVELS = [
+  { min:0,    max:9,    name:'มือใหม่',      badge:'🌱', cls:'lvl-1', color:'#9CA3AF' },
+  { min:10,   max:29,   name:'ผู้ใช้ทั่วไป', badge:'🔵', cls:'lvl-2', color:'#3B82F6' },
+  { min:30,   max:79,   name:'ผู้ช่วยเหลือ', badge:'🟢', cls:'lvl-3', color:'#10B981' },
+  { min:80,   max:199,  name:'ผู้เชี่ยวชาญ', badge:'🥇', cls:'lvl-4', color:'#F59E0B' },
+  { min:200,  max:9999, name:'กูรูกฎหมาย',  badge:'💎', cls:'lvl-5', color:'#8B5CF6' },
+];
+
+function getLevel(pts){ return LEVELS.find(l=>pts>=l.min&&pts<=l.max)||LEVELS[0]; }
+
+// ===== CONTACT FILTER (ป้องกันการโพสต์ข้อมูลติดต่อ) =====
+const BLOCK_PATTERNS = [
+  // เบอร์โทรไทย
+  /0[6-9]\d[\s\-.]?\d{3,4}[\s\-.]?\d{3,4}/g,
+  /\b0[0-9]{8,9}\b/g,
+  // +66
+  /\+66[\s\-]?\d[\s\-]?\d{3,4}[\s\-]?\d{4}/g,
+  // LINE ID
+  /line[\s:id]*[\w.\-_@]{3,30}/gi,
+  /ไลน์[\s:]*[\w.\-_@]{2,30}/gi,
+  /line\s*id\s*[:=]?\s*\S+/gi,
+  // Telegram
+  /t\.me\/\S+/gi,
+  /telegram[\s:@]*\S+/gi,
+  // Facebook personal
+  /fb\.com\/(?!hathanai)\S+/gi,
+  /facebook\.com\/(?!hathanai)\S+/gi,
+  // อีเมล (ยกเว้นในฟอร์มสมัครสมาชิก)
+  /[\w.\-]+@[\w.\-]+\.[a-z]{2,6}/gi,
+  // Whatsapp
+  /whatsapp[\s:]*\S+/gi,
+  // เบอร์แบบตัวอักษรแทน
+  /[0๐][6-9๖-๙][\d\s\-.()\u0E50-\u0E59]{7,}/g,
+];
+
+const BLOCK_WORDS = [
+  'เบอร์ผม','เบอร์ฉัน','โทรหา','ติดต่อโดยตรง','ติดต่อส่วนตัว',
+  'ไลน์ผม','ไลน์ฉัน','line ผม','add line','@line',
+  'โทรมาได้','โทรเลย','แอดมาได้','inbox มา','dm มา',
+];
+
+function containsContactInfo(text){
+  for(const p of BLOCK_PATTERNS){
+    p.lastIndex=0;
+    if(p.test(text)) return true;
+  }
+  const lower = text.toLowerCase();
+  for(const w of BLOCK_WORDS){
+    if(lower.includes(w.toLowerCase())) return true;
+  }
+  return false;
+}
+
+function sanitizeText(text){
+  let out = text;
+  for(const p of BLOCK_PATTERNS){
+    p.lastIndex=0;
+    out = out.replace(p,'[ข้อมูลติดต่อถูกซ่อน]');
+  }
+  return out;
+}
+
+// ===== LOCAL STORAGE HELPERS =====
+function saveUsers(users){ localStorage.setItem('ht_users', JSON.stringify(users)); }
+function loadUsers(){ try{ return JSON.parse(localStorage.getItem('ht_users'))||{}; }catch(e){ return {}; } }
+function saveSession(user){ localStorage.setItem('ht_session', JSON.stringify(user)); }
+function loadSession(){ try{ return JSON.parse(localStorage.getItem('ht_session')); }catch(e){ return null; } }
+function clearSession(){ localStorage.removeItem('ht_session'); }
+function saveQA(qa){ localStorage.setItem('ht_qa', JSON.stringify(qa)); }
+function loadQA(){ try{ return JSON.parse(localStorage.getItem('ht_qa'))||[]; }catch(e){ return []; } }
+
+// ===== SESSION STATE =====
+let currentUser = loadSession();
+
 // ===== MODAL =====
-function openModal(id){document.getElementById(id).classList.add('open')}
-function closeModal(id){document.getElementById(id).classList.remove('open')}
+function openModal(id){ document.getElementById(id).classList.add('open'); }
+function closeModal(id){ document.getElementById(id).classList.remove('open'); }
 document.querySelectorAll('.modal-overlay').forEach(o=>{
-  o.addEventListener('click',e=>{if(e.target===o)o.classList.remove('open')})
-})
+  o.addEventListener('click', e=>{ if(e.target===o) o.classList.remove('open'); });
+});
 
 // ===== TOAST =====
-function showToast(msg){
-  const t=document.getElementById('toast');
-  t.textContent=msg;t.classList.add('show');
-  setTimeout(()=>t.classList.remove('show'),3500);
+function showToast(msg, type='success'){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.style.borderLeftColor = type==='error'?'#EF4444': type==='warn'?'#F59E0B':'#10B981';
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'), 4000);
 }
 
 // ===== MOBILE MENU =====
-function openMobileMenu(){document.getElementById('mobileMenu').classList.add('open')}
-function closeMobileMenu(){document.getElementById('mobileMenu').classList.remove('open')}
+function openMobileMenu(){ document.getElementById('mobileMenu').classList.add('open'); }
+function closeMobileMenu(){ document.getElementById('mobileMenu').classList.remove('open'); }
 
 // ===== SEARCH =====
 function doSearch(){
-  const type=document.getElementById('searchType').value;
-  const prov=document.getElementById('searchProvince').value;
-  showToast('กำลังค้นหา'+(prov?' ใน'+prov:'')+(type?' ประเภท'+document.getElementById('searchType').options[document.getElementById('searchType').selectedIndex].text:'')+'...');
+  const type = document.getElementById('searchType').value;
+  const prov = document.getElementById('searchProvince').value;
+  const label = document.getElementById('searchType').options[document.getElementById('searchType').selectedIndex].text;
+  showToast('กำลังค้นหา'+(prov?' ใน'+prov:'')+(type?' · '+label:'')+'...');
   document.getElementById('find').scrollIntoView({behavior:'smooth'});
 }
 
-// ===== CASE FILTER =====
 function filterCase(type){
-  document.getElementById('searchType').value=type;
-  showToast('กรองแสดงทนาย: '+type);
+  document.getElementById('searchType').value = type;
   document.getElementById('find').scrollIntoView({behavior:'smooth'});
 }
 
-// ===== DONATE =====
-function setDonate(n){document.getElementById('donateAmount').value=n}
+function setDonate(n){ document.getElementById('donateAmount').value = n; }
 
 // ===== NAVBAR ACTIVE =====
 window.addEventListener('scroll',()=>{
   const sections=['home','find','qa','knowledge','register-lawyer'];
-  const links=document.querySelectorAll('.navbar-links a');
+  const links = document.querySelectorAll('.navbar-links a');
   let cur='';
   sections.forEach(id=>{
     const el=document.getElementById(id);
-    if(el&&window.scrollY>=el.offsetTop-80)cur='#'+id;
+    if(el && window.scrollY>=el.offsetTop-80) cur='#'+id;
   });
-  links.forEach(l=>{
-    l.classList.toggle('active',l.getAttribute('href')===cur);
+  links.forEach(l=>l.classList.toggle('active', l.getAttribute('href')===cur));
+},{passive:true});
+
+// ===== UPDATE NAVBAR UI =====
+function updateNavUI(){
+  const loginBtn  = document.getElementById('navLoginBtn');
+  const regBtn    = document.getElementById('navRegBtn');
+  const userChip  = document.getElementById('navUserChip');
+  if(!loginBtn) return;
+  if(currentUser && currentUser.verified){
+    const lv = getLevel(currentUser.points||0);
+    loginBtn.style.display='none';
+    regBtn.style.display='none';
+    userChip.style.display='flex';
+    userChip.innerHTML=`
+      <span style="font-size:1rem">${lv.badge}</span>
+      <span style="font-size:0.82rem;font-weight:700;color:var(--gold)">${currentUser.name.split(' ')[0]}</span>
+      <span style="font-size:0.7rem;color:#8AACC4">${lv.name}</span>
+      <button onclick="doLogout()" style="background:rgba(255,255,255,0.1);border:none;color:#8AACC4;font-size:0.72rem;padding:2px 8px;border-radius:10px;cursor:pointer;margin-left:4px">ออก</button>
+    `;
+  } else {
+    loginBtn.style.display='';
+    regBtn.style.display='';
+    userChip.style.display='none';
+  }
+}
+
+// ===== REGISTER =====
+function doRegister(){
+  const name  = document.getElementById('regName').value.trim();
+  const email = document.getElementById('regEmail').value.trim().toLowerCase();
+  const pass  = document.getElementById('regPass').value;
+  const chk   = document.getElementById('chkTerms').checked;
+
+  if(!name||!email||!pass){ showToast('กรุณากรอกข้อมูลให้ครบ','error'); return; }
+  if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){ showToast('รูปแบบอีเมลไม่ถูกต้อง','error'); return; }
+  if(pass.length<8){ showToast('รหัสผ่านต้องมีอย่างน้อย 8 ตัวอักษร','error'); return; }
+  if(!chk){ showToast('กรุณายอมรับเงื่อนไขการใช้งาน','warn'); return; }
+
+  const users = loadUsers();
+  if(users[email]){ showToast('อีเมลนี้มีในระบบแล้ว','error'); return; }
+
+  // สร้าง token ยืนยันอีเมล
+  const token = Math.random().toString(36).slice(2)+Date.now().toString(36);
+  users[email] = {
+    name, email,
+    passHash: btoa(pass+email), // simple hash for demo
+    points: 0,
+    answers: 0,
+    bestAnswers: 0,
+    verified: false,
+    verifyToken: token,
+    role: 'user',
+    joinDate: new Date().toISOString(),
+  };
+  saveUsers(users);
+
+  // แสดง popup ยืนยันอีเมล (จำลอง — Phase 1 ใช้ลิงก์จำลอง)
+  closeModal('registerModal');
+  showVerifyEmailPopup(email, token, name);
+}
+
+function showVerifyEmailPopup(email, token, name){
+  const overlay = document.createElement('div');
+  overlay.className='modal-overlay open';
+  overlay.id='verifyPopup';
+  overlay.innerHTML=`
+    <div class="modal" style="text-align:center">
+      <div style="font-size:3rem;margin-bottom:1rem">📧</div>
+      <h3 style="margin-bottom:0.5rem">ยืนยันอีเมลของคุณ</h3>
+      <p class="sub">ส่งลิงก์ยืนยันไปที่<br><strong style="color:var(--navy)">${email}</strong></p>
+      <div style="background:#F0FDF4;border-radius:8px;padding:1rem;margin:1rem 0;border:1px solid #BBF7D0;font-size:0.85rem;color:#065F46;line-height:1.7">
+        📌 <strong>Phase 1 — ระบบจำลอง:</strong><br>
+        กดปุ่มด้านล่างเพื่อจำลองการยืนยันอีเมล<br>
+        (Phase 2 จะส่งอีเมลจริงผ่าน SendGrid)
+      </div>
+      <button class="btn btn-gold btn-lg" style="width:100%;margin-bottom:0.8rem"
+        onclick="confirmVerify('${email}','${token}')">
+        ✅ จำลองการคลิกลิงก์ยืนยัน
+      </button>
+      <button class="btn btn-outline" style="width:100%;font-size:0.82rem"
+        onclick="document.getElementById('verifyPopup').remove()">
+        ปิด (ยืนยันทีหลัง)
+      </button>
+      <p style="margin-top:1rem;font-size:0.78rem;color:var(--muted)">
+        ไม่ได้รับอีเมล? ตรวจสอบ Spam หรือ
+        <a href="#" onclick="resendVerify('${email}')" style="color:var(--gold)">ส่งใหม่</a>
+      </p>
+    </div>`;
+  document.body.appendChild(overlay);
+}
+
+function confirmVerify(email, token){
+  const users = loadUsers();
+  if(users[email] && users[email].verifyToken===token){
+    users[email].verified = true;
+    users[email].verifyToken = null;
+    saveUsers(users);
+    currentUser = users[email];
+    saveSession(currentUser);
+    document.getElementById('verifyPopup')?.remove();
+    updateNavUI();
+    showToast(`ยินดีต้อนรับ ${currentUser.name}! ยืนยันอีเมลสำเร็จ ✅`);
+    showUserWelcome();
+  }
+}
+
+function resendVerify(email){
+  showToast('ส่งอีเมลยืนยันใหม่แล้ว (ตรวจสอบ inbox)','warn');
+}
+
+function showUserWelcome(){
+  const lv = getLevel(currentUser.points||0);
+  const overlay = document.createElement('div');
+  overlay.className='modal-overlay open';
+  overlay.innerHTML=`
+    <div class="modal" style="text-align:center">
+      <div style="font-size:3rem;margin-bottom:0.5rem">${lv.badge}</div>
+      <h3>ยินดีต้อนรับสู่ หาทนาย!</h3>
+      <p class="sub">${currentUser.name}</p>
+      <div style="background:#F5F3FF;border-radius:8px;padding:1rem;margin:1rem 0;border:1px solid #DDD6FE">
+        <div style="font-weight:700;color:#6C5CE7;margin-bottom:0.5rem">ระดับของคุณ: ${lv.badge} ${lv.name}</div>
+        <div style="font-size:0.82rem;color:#5B4B8A;line-height:1.6">
+          ตอบคำถาม Q&A เพื่อสะสมคะแนน<br>
+          และเลื่อนระดับอัตโนมัติ
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:0.4rem;margin-bottom:1rem">
+        ${LEVELS.map(l=>`
+          <div style="text-align:center;padding:0.4rem;border-radius:6px;background:${currentUser.points>=l.min?'#F0FDF4':'#F9FAFB'};border:1px solid ${currentUser.points>=l.min?'#BBF7D0':'#E5E7EB'}">
+            <div style="font-size:1rem">${l.badge}</div>
+            <div style="font-size:0.62rem;font-weight:700;color:${currentUser.points>=l.min?'#065F46':'#9CA3AF'}">${l.name}</div>
+            <div style="font-size:0.6rem;color:#9CA3AF">${l.min}+ แต้ม</div>
+          </div>`).join('')}
+      </div>
+      <button class="btn btn-gold" style="width:100%;padding:0.7rem" onclick="this.closest('.modal-overlay').remove()">เริ่มใช้งาน →</button>
+    </div>`;
+  document.body.appendChild(overlay);
+}
+
+// ===== LOGIN =====
+function doLogin(){
+  const email = document.getElementById('loginEmail').value.trim().toLowerCase();
+  const pass  = document.getElementById('loginPass').value;
+  if(!email||!pass){ showToast('กรุณากรอกอีเมลและรหัสผ่าน','error'); return; }
+
+  const users = loadUsers();
+  const user  = users[email];
+  if(!user){ showToast('ไม่พบอีเมลนี้ในระบบ','error'); return; }
+  if(user.passHash !== btoa(pass+email)){ showToast('รหัสผ่านไม่ถูกต้อง','error'); return; }
+  if(!user.verified){
+    showToast('กรุณายืนยันอีเมลก่อนเข้าใช้งาน','warn');
+    closeModal('loginModal');
+    showVerifyEmailPopup(email, user.verifyToken, user.name);
+    return;
+  }
+  currentUser = user;
+  saveSession(currentUser);
+  closeModal('loginModal');
+  updateNavUI();
+  showToast(`ยินดีต้อนรับกลับ ${user.name}! 👋`);
+}
+
+// ===== LOGOUT =====
+function doLogout(){
+  clearSession();
+  currentUser = null;
+  updateNavUI();
+  showToast('ออกจากระบบแล้ว');
+}
+
+// ===== POINTS & LEVEL =====
+function addPoints(pts, reason){
+  if(!currentUser) return;
+  const users = loadUsers();
+  users[currentUser.email].points = (users[currentUser.email].points||0) + pts;
+  const oldLv = getLevel((currentUser.points||0));
+  currentUser.points = users[currentUser.email].points;
+  saveUsers(users);
+  saveSession(currentUser);
+  const newLv = getLevel(currentUser.points);
+  if(newLv.min !== oldLv.min){
+    showToast(`🎉 เลื่อนระดับเป็น ${newLv.badge} ${newLv.name}!`);
+  }
+  updateNavUI();
+  updateUserBar();
+}
+
+function updateUserBar(){
+  const bar = document.getElementById('userPointBar');
+  if(!bar||!currentUser) return;
+  const lv  = getLevel(currentUser.points||0);
+  const nextLv = LEVELS[LEVELS.indexOf(lv)+1];
+  const pct = nextLv ? Math.min(100,((currentUser.points-lv.min)/(nextLv.min-lv.min))*100) : 100;
+  bar.innerHTML=`
+    <div style="display:flex;align-items:center;gap:0.6rem;font-size:0.82rem">
+      <span style="font-size:1.1rem">${lv.badge}</span>
+      <strong style="color:var(--navy)">${lv.name}</strong>
+      <span style="color:var(--muted)">${currentUser.points} แต้ม</span>
+      ${nextLv?`<span style="color:var(--muted);font-size:0.72rem">→ ${nextLv.name} ที่ ${nextLv.min} แต้ม</span>`:'<span style="color:#8B5CF6;font-weight:700">ระดับสูงสุด!</span>'}
+    </div>
+    <div style="background:#E5E7EB;border-radius:10px;height:6px;margin-top:0.4rem;overflow:hidden">
+      <div style="width:${pct}%;height:100%;background:linear-gradient(90deg,var(--gold),var(--gold2));border-radius:10px;transition:width 0.5s"></div>
+    </div>`;
+}
+
+// ===== GRACE Q&A =====
+let graceSession = null;
+let graceCount   = parseInt(localStorage.getItem('ht_grace_count')||'0');
+let graceDate    = localStorage.getItem('ht_grace_date')||'';
+
+function checkGraceLimit(){
+  const today = new Date().toDateString();
+  if(graceDate!==today){ graceCount=0; graceDate=today; localStorage.setItem('ht_grace_count','0'); localStorage.setItem('ht_grace_date',today); }
+  return graceCount < 3;
+}
+
+function activateGrace(){
+  if(!checkGraceLimit()){ showToast('ครบ 3 คำถามต่อวันแล้ว สมัครสมาชิกเพื่อถามไม่จำกัด','warn'); return; }
+  graceSession = 'grace_'+Date.now();
+  document.getElementById('graceCheckbox').checked=false;
+  openModal('graceModal');
+}
+
+function submitGraceQuestion(){
+  const chk  = document.getElementById('graceCheckbox').checked;
+  const type = document.getElementById('graceType').value;
+  const text = document.getElementById('graceText').value.trim();
+  if(!chk){ showToast('กรุณายืนยัน Grace ก่อน','warn'); return; }
+  if(!text||text.length<20){ showToast('กรุณาอธิบายปัญหาให้มากกว่า 20 ตัวอักษร','error'); return; }
+
+  // ตรวจข้อมูลติดต่อ
+  if(containsContactInfo(text)){
+    showToast('❌ ห้ามใส่เบอร์โทร LINE หรือข้อมูลติดต่อส่วนตัว','error');
+    document.getElementById('qaBlockWarn').style.display='block';
+    return;
+  }
+
+  const qa = loadQA();
+  qa.unshift({
+    id: Date.now(),
+    type, text,
+    by: 'ผู้ไม่ประสงค์ออกนาม',
+    role: 'grace',
+    answers: [],
+    upvotes: 0,
+    ts: new Date().toISOString(),
+  });
+  saveQA(qa);
+  graceCount++;
+  localStorage.setItem('ht_grace_count', graceCount.toString());
+  closeModal('graceModal');
+  showToast(`✅ โพสต์คำถามแล้ว (${3-graceCount} คำถามคงเหลือวันนี้)`);
+  renderQA();
+}
+
+// ===== POST ANSWER =====
+function submitAnswer(qaId){
+  if(!currentUser||!currentUser.verified){
+    showToast('กรุณาเข้าสู่ระบบก่อนตอบคำถาม','warn');
+    openModal('loginModal');
+    return;
+  }
+  const textarea = document.getElementById('ans_'+qaId);
+  if(!textarea) return;
+  const text = textarea.value.trim();
+  if(!text||text.length<20){ showToast('กรุณาตอบให้มากกว่า 20 ตัวอักษร','error'); return; }
+
+  // ตรวจข้อมูลติดต่อ
+  if(containsContactInfo(text)){
+    showToast('❌ ห้ามใส่เบอร์โทร LINE หรือข้อมูลติดต่อส่วนตัวในคำตอบ','error');
+    return;
+  }
+
+  const qa = loadQA();
+  const q  = qa.find(q=>q.id===qaId);
+  if(!q) return;
+
+  const lv = getLevel(currentUser.points||0);
+  q.answers.push({
+    id: Date.now(),
+    text: sanitizeText(text),
+    by: currentUser.name,
+    email: currentUser.email,
+    badge: lv.badge,
+    levelName: lv.name,
+    role: currentUser.role,
+    upvotes: 0,
+    best: false,
+    ts: new Date().toISOString(),
+    charCount: text.length,
+  });
+  saveQA(qa);
+
+  // ให้คะแนนอัตโนมัติ
+  let pts = 5; // ตอบ 1 ข้อ
+  if(text.length>200) pts+=3; // คำตอบยาว
+  // ตรวจ streak
+  const users = loadUsers();
+  const lastAns = users[currentUser.email]?.lastAnswerDate||'';
+  const yesterday = new Date(Date.now()-86400000).toDateString();
+  const todayStr = new Date().toDateString();
+  let streak = users[currentUser.email]?.streak||0;
+  if(lastAns===yesterday){ streak++; }
+  else if(lastAns!==todayStr){ streak=1; }
+  if(streak>=7) pts+=20;
+  users[currentUser.email].streak = streak;
+  users[currentUser.email].lastAnswerDate = todayStr;
+  users[currentUser.email].answers = (users[currentUser.email].answers||0)+1;
+  saveUsers(users);
+
+  addPoints(pts, 'ตอบคำถาม');
+  showToast(`✅ ตอบแล้ว +${pts} แต้ม`);
+  renderQA();
+}
+
+// ===== UPVOTE =====
+function upvoteAnswer(qaId, ansId){
+  if(!currentUser){ showToast('กรุณาเข้าสู่ระบบก่อน Upvote','warn'); return; }
+  const qa = loadQA();
+  const q  = qa.find(q=>q.id===qaId);
+  const a  = q?.answers?.find(a=>a.id===ansId);
+  if(!a) return;
+  if(a.upvotedBy?.includes(currentUser.email)){ showToast('คุณ Upvote แล้ว','warn'); return; }
+  a.upvotes = (a.upvotes||0)+1;
+  a.upvotedBy = [...(a.upvotedBy||[]), currentUser.email];
+  saveQA(qa);
+  // ให้คะแนนผู้ตอบ
+  const users = loadUsers();
+  if(users[a.email]){
+    users[a.email].points=(users[a.email].points||0)+10;
+    saveUsers(users);
+    if(a.email===currentUser.email){ addPoints(10,'upvote'); }
+  }
+  showToast('+10 แต้มให้ผู้ตอบ');
+  renderQA();
+}
+
+// ===== MARK BEST =====
+function markBest(qaId, ansId){
+  if(!currentUser){ showToast('กรุณาเข้าสู่ระบบก่อน','warn'); return; }
+  const qa = loadQA();
+  const q  = qa.find(q=>q.id===qaId);
+  if(!q) return;
+  q.answers.forEach(a=>{ a.best=false; });
+  const a = q.answers.find(a=>a.id===ansId);
+  if(a){ a.best=true; }
+  saveQA(qa);
+  const users=loadUsers();
+  if(a&&users[a.email]){
+    users[a.email].points=(users[a.email].points||0)+25;
+    users[a.email].bestAnswers=(users[a.email].bestAnswers||0)+1;
+    saveUsers(users);
+    if(a.email===currentUser.email) addPoints(25,'bestAnswer');
+  }
+  showToast('✅ เลือกเป็นคำตอบดีที่สุด +25 แต้ม!');
+  renderQA();
+}
+
+// ===== RENDER Q&A =====
+function typeLabel(type){
+  const map={
+    civil:'<span class="qa-type-badge type-civil">📋 คดีแพ่ง</span>',
+    criminal:'<span class="qa-type-badge type-criminal">📋 คดีอาญา</span>',
+    heritage:'<span class="qa-type-badge type-heritage">📋 คดีมรดก</span>',
+    labour:'<span class="qa-type-badge" style="background:#D1FAE5;color:#065F46">📋 คดีแรงงาน</span>',
+    family:'<span class="qa-type-badge" style="background:#FCE7F3;color:#9D174D">📋 คดีครอบครัว</span>',
+    cheque:'<span class="qa-type-badge" style="background:#FEF3C7;color:#92400E">📋 คดีเช็ค</span>',
+    administrative:'<span class="qa-type-badge type-admin">🏛️ คดีปกครอง</span>',
+    corruption:'<span class="qa-type-badge type-corruption">⚖️ คดีทุจริต</span>',
+  };
+  return map[type]||'<span class="qa-type-badge type-civil">📋 ทั่วไป</span>';
+}
+
+function timeAgo(iso){
+  const diff=Date.now()-new Date(iso).getTime();
+  const m=Math.floor(diff/60000);
+  if(m<1) return 'เมื่อกี้';
+  if(m<60) return m+' นาทีที่แล้ว';
+  const h=Math.floor(m/60);
+  if(h<24) return h+' ชั่วโมงที่แล้ว';
+  return Math.floor(h/24)+' วันที่แล้ว';
+}
+
+function renderQA(){
+  const container = document.getElementById('dynamicQA');
+  if(!container) return;
+  const qa = loadQA();
+  if(qa.length===0){ container.innerHTML=''; return; }
+  container.innerHTML = qa.slice(0,10).map(q=>{
+    const canMark = currentUser && q.answers.some(a=>a.email!==currentUser.email);
+    return `
+    <div class="qa-card" id="qa_${q.id}">
+      <div class="qa-card-head">
+        <div class="qa-meta">
+          ${typeLabel(q.type)}
+          <span style="font-size:0.7rem;background:${q.answers.length>0?'#D1FAE5':'#FEF3C7'};color:${q.answers.length>0?'#065F46':'#92400E'};padding:2px 8px;border-radius:20px;font-weight:700">
+            ${q.answers.length>0?q.answers.length+' คำตอบ':'รอผู้เชี่ยวชาญตอบ'}
+          </span>
+        </div>
+        <div class="qa-title">${escHtml(q.text.substring(0,120))}${q.text.length>120?'...':''}</div>
+        <div class="qa-by">🕊️ ${escHtml(q.by)} · ${timeAgo(q.ts)}</div>
+      </div>
+      ${q.answers.map(a=>`
+        <div class="qa-answer" style="${a.best?'border-left-color:#F59E0B;background:#FFFBEB':''}">
+          <div class="qa-answer-by">
+            ${a.role==='lawyer'?'<span class="lc-badge-lawyer" style="font-size:0.68rem">⚖ ทนายความ ✓</span>':''}
+            <span style="font-size:0.7rem;font-weight:700;padding:2px 7px;border-radius:10px;background:#EDE9FE;color:#5B21B6">${a.badge} ${a.levelName}</span>
+            <strong style="font-size:0.85rem">${escHtml(a.by)}</strong>
+            <span style="font-size:0.75rem;color:#9CA3AF">· ${timeAgo(a.ts)}</span>
+            ${a.best?'<span style="background:#F59E0B;color:#fff;font-size:0.65rem;font-weight:700;padding:2px 8px;border-radius:10px">⭐ ดีที่สุด</span>':''}
+          </div>
+          <p style="font-size:0.85rem;line-height:1.6;color:#374151">${escHtml(a.text)}</p>
+          <div style="display:flex;gap:0.6rem;margin-top:0.5rem;align-items:center">
+            <button onclick="upvoteAnswer(${q.id},${a.id})"
+              style="background:${(a.upvotedBy||[]).includes(currentUser?.email||'')?'#EDE9FE':'#F3F4F6'};border:none;padding:3px 10px;border-radius:10px;font-size:0.75rem;cursor:pointer">
+              👍 ${a.upvotes||0}
+            </button>
+            ${canMark&&!a.best?`<button onclick="markBest(${q.id},${a.id})" style="background:#FEF3C7;border:none;padding:3px 10px;border-radius:10px;font-size:0.72rem;cursor:pointer;color:#92400E">⭐ เลือกเป็นคำตอบดีที่สุด</button>`:''}
+          </div>
+        </div>`).join('')}
+      ${currentUser&&currentUser.verified?`
+        <div style="padding:0.8rem 1.2rem;background:#F9FAFB;border-top:1px solid #F3F4F6">
+          <textarea id="ans_${q.id}" placeholder="พิมพ์คำตอบ... (ห้ามใส่เบอร์โทร/LINE)"
+            style="width:100%;border:1.5px solid var(--border);border-radius:6px;padding:0.6rem;font-family:'Sarabun',sans-serif;font-size:0.85rem;resize:vertical;min-height:60px;outline:none"
+            oninput="checkContactRealtime(this)"></textarea>
+          <div id="warn_${q.id}" style="display:none;color:#C0392B;font-size:0.78rem;margin-top:0.3rem">⚠️ ตรวจพบข้อมูลติดต่อ — จะถูกซ่อนอัตโนมัติ</div>
+          <button onclick="submitAnswer(${q.id})" class="btn btn-green" style="margin-top:0.5rem;padding:0.4rem 1.2rem;font-size:0.82rem">ตอบ (+5 แต้ม)</button>
+        </div>`:`
+        <div class="qa-actions">
+          <span style="font-size:0.78rem;color:#9CA3AF">👍 ${q.answers.reduce((s,a)=>s+(a.upvotes||0),0)}</span>
+          <button onclick="openModal('loginModal')" style="background:transparent;border:1px solid #E5E7EB;color:#6B7280;padding:0.3rem 0.8rem;border-radius:4px;font-size:0.75rem;font-family:'Sarabun',sans-serif;cursor:pointer">🔒 ล็อกอินเพื่อตอบ</button>
+        </div>`}
+    </div>`;
+  }).join('');
+}
+
+function checkContactRealtime(el){
+  const warnId='warn_'+el.id.replace('ans_','');
+  const warn=document.getElementById(warnId);
+  if(warn) warn.style.display=containsContactInfo(el.value)?'block':'none';
+}
+
+function escHtml(str){
+  return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// ===== SUBMIT CASE WITH PROTECTION =====
+function submitCase(){
+  const desc = document.querySelector('#caseModal textarea')?.value||'';
+  if(containsContactInfo(desc)){
+    showToast('❌ ห้ามใส่เบอร์โทรหรือข้อมูลติดต่อในรายละเอียดคดี','error');
+    document.getElementById('caseBlockWarn').style.display='block';
+    return;
+  }
+  showToast('ส่งคดีสำเร็จ ✅ รอทีมงานติดต่อกลับ');
+  closeModal('caseModal');
+}
+
+// ===== INIT =====
+document.addEventListener('DOMContentLoaded',()=>{
+  updateNavUI();
+  updateUserBar();
+  renderQA();
+
+  // intercept Enter key on login form
+  document.getElementById('loginPass')?.addEventListener('keydown',e=>{
+    if(e.key==='Enter') doLogin();
   });
 });
 </script>
